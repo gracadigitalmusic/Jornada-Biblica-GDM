@@ -118,7 +118,7 @@ export function CoopEntryScreen({ onBack, onEnterLobby }: CoopEntryScreenProps) 
       
       <div>
         <label className="block text-sm font-bold mb-2">Escolha seu Avatar</label>
-        <div className="grid grid-cols-8 gap-2">
+        <div className="grid grid-cols-7 gap-2"> {/* Alterado para 7 colunas */}
           {AVATARS_MULTI.map((avatar) => (
             <button
               key={avatar}

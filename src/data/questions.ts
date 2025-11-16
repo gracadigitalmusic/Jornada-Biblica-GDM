@@ -35,5 +35,23 @@ export const GAME_CONSTANTS = {
   }
 };
 
-export const AVATARS_SOLO = ["👨", "👩", "🧔", "👴", "👵", "🧑", "🧒", "👶"];
-export const AVATARS_MULTI = ["👨", "👩", "🧔", "👴", "👵", "🧑", "🧒", "👦", "👧", "🙋‍♂️", "🙋‍♀️", "🤷‍♂️"];
+// Avatares com diversidade de etnias (tons de pele)
+const ETHNICITY_SUFFIXES = ['', '🏻', '🏼', '🏽', '🏾', '🏿'];
+
+const generateAvatars = (baseAvatars: string[]) => {
+  const avatars: string[] = [];
+  baseAvatars.forEach(base => {
+    ETHNICITY_SUFFIXES.forEach(suffix => {
+      avatars.push(base + suffix);
+    });
+  });
+  return avatars;
+};
+
+// Avatares base para Solo (mais focados em indivíduos)
+const BASE_AVATARS_SOLO = ["👨", "👩", "🧔", "👴", "👵", "🧑", "🧒", "👶"];
+export const AVATARS_SOLO = generateAvatars(BASE_AVATARS_SOLO);
+
+// Avatares base para Multi (incluindo gestos e mais opções)
+const BASE_AVATARS_MULTI = ["👨", "👩", "🧔", "👴", "👵", "🧑", "🧒", "👦", "👧", "🙋", "🤷"];
+export const AVATARS_MULTI = generateAvatars(BASE_AVATARS_MULTI);

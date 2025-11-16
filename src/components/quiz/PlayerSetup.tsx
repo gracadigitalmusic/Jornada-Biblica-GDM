@@ -22,7 +22,7 @@ export function PlayerSetup({ open, onClose, onStart, mode }: PlayerSetupProps) 
       if (mode === 'solo') {
         // Load last user
         const lastUser = localStorage.getItem('jb_last_user');
-        const data = lastUser ? JSON.parse(lastUser) : { name: '', avatar: '📖' };
+        const data = lastUser ? JSON.parse(lastUser) : { name: '', avatar: AVATARS_SOLO[0] };
         setPlayers([data]);
       } else {
         // Initialize with 2 players
@@ -49,7 +49,8 @@ export function PlayerSetup({ open, onClose, onStart, mode }: PlayerSetupProps) 
   const handleAddPlayer = () => {
     if (players.length < 5) {
       const usedAvatars = players.map(p => p.avatar);
-      const availableAvatar = AVATARS_MULTI.find(a => !usedAvatars.includes(a)) || AVATARS_MULTI[players.length];
+      // Tenta encontrar um avatar não usado, se não, usa o próximo da lista
+      const availableAvatar = AVATARS_MULTI.find(a => !usedAvatars.includes(a)) || AVATARS_MULTI[players.length % AVATARS_MULTI.length];
       setPlayers(prev => [...prev, { name: '', avatar: availableAvatar }]);
     }
   };
@@ -133,7 +134,7 @@ export function PlayerSetup({ open, onClose, onStart, mode }: PlayerSetupProps) 
                   )}
                 </div>
 
-                <div className="flex flex-wrap gap-2 justify-center">
+                <div className="grid grid-cols-7 gap-2 justify-center"> {/* Alterado para 7 colunas */}
                   {avatars.map((avatar) => {
                     const isSelected = player.avatar === avatar;
                     const isTaken = usedAvatars.includes(avatar) && !isSelected;
@@ -147,7 +148,7 @@ export function PlayerSetup({ open, onClose, onStart, mode }: PlayerSetupProps) 
                           w-12 h-12 rounded-full text-2xl flex items-center justify-center
                           transition-all duration-200 border-2
                           ${isSelected 
-                            ? 'border-primary bg-primary text-primary-foreground scale-110' 
+                            ? 'border-primary bg-primary/20 text-primary scale-110 ring-2 ring-primary' 
                             : isTaken
                             ? 'border-destructive/30 opacity-30 cursor-not-allowed'
                             : 'border-border hover:border-primary hover:bg-muted'

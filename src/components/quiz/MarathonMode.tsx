@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Trophy, Zap, Heart, Target } from 'lucide-react';
 import { Player } from '@/types/quiz';
+import { AVATARS_SOLO } from '@/data/questions'; // Usando AVATARS_SOLO expandido
 
 interface MarathonModeProps {
   onStart: (player: Player) => void;
@@ -12,9 +13,9 @@ interface MarathonModeProps {
 
 export function MarathonMode({ onStart, onBack }: MarathonModeProps) {
   const [playerName, setPlayerName] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState('👨');
+  const [selectedAvatar, setSelectedAvatar] = useState(AVATARS_SOLO[0]);
 
-  const avatars = ["👨", "👩", "🧔", "👴", "👵", "🧑", "🧒", "👶"];
+  const avatars = AVATARS_SOLO;
 
   const handleStart = () => {
     if (!playerName.trim()) return;
@@ -82,7 +83,7 @@ export function MarathonMode({ onStart, onBack }: MarathonModeProps) {
 
             <div>
               <label className="block text-sm font-bold mb-2">Escolha seu Avatar</label>
-              <div className="grid grid-cols-8 gap-2">
+              <div className="grid grid-cols-7 gap-2"> {/* Alterado para 7 colunas */}
                 {avatars.map((avatar) => (
                   <button
                     key={avatar}
@@ -90,7 +91,7 @@ export function MarathonMode({ onStart, onBack }: MarathonModeProps) {
                     className={`text-3xl p-2 rounded-lg transition-all ${
                       selectedAvatar === avatar
                         ? 'bg-primary/20 ring-2 ring-primary scale-110'
-                        : 'bg-background hover:bg-muted'
+                        : 'bg-background hover:bg-muted border border-border'
                     }`}
                   >
                     {avatar}
