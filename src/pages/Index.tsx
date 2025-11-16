@@ -20,12 +20,17 @@ import { useGameSettings } from "@/hooks/useGameSettings";
 import { useNarration } from "@/hooks/useNarration";
 import { useStoryMode } from "@/hooks/useStoryMode";
 import { useVirtualShop } from "@/hooks/useVirtualShop";
+import { useStats } from "@/hooks/useStats";
+import { useDailyChallenge } from "@/hooks/useDailyChallenge";
 import { Player, GameMode } from "@/types/quiz";
 import { StoryModeScreen } from "@/components/quiz/StoryModeScreen";
 import { VirtualShop } from "@/components/quiz/VirtualShop";
 import { AICompanion } from "@/components/quiz/AICompanion";
 import { CoopLobby } from "@/components/quiz/CoopLobby";
 import { useCoopMode } from "@/hooks/useCoopMode";
+import { StatsModal } from "@/components/quiz/StatsModal";
+import { DailyChallengeCard } from "@/components/quiz/DailyChallengeCard";
+import { GAME_CONSTANTS } from "@/data/questions";
 
 const Index = () => {
   const [gameMode, setGameMode] = useState<GameMode>("menu");
@@ -38,6 +43,7 @@ const Index = () => {
   const [isGameOverState, setIsGameOverState] = useState(false);
   const [showNextButton, setShowNextButton] = useState(false);
   const [showCoopLobby, setShowCoopLobby] = useState(false);
+  const [showStats, setShowStats] = useState(false);
 
   const quiz = useQuizGame();
   const achievements = useAchievements();
@@ -49,7 +55,9 @@ const Index = () => {
   const { speak, cancel } = useNarration();
   const storyMode = useStoryMode();
   const virtualShop = useVirtualShop();
-  const coop = useCoopMode(); // Novo hook para Co-op
+  const coop = useCoopMode();
+  const stats = useStats();
+  const dailyChallenge = useDailyChallenge();
 
   // Check for timeout
   useEffect(() => {
@@ -96,29 +104,37 @@ const Index = () => {
   };
 
   const handleShowShop = () => {
-    setShowPowerUpShop(true); // Reutilizando a mesma modal
+    setShowPowerUpShop(true);
+  };
+  
+  const handleShowStats = () => {
+    setShowStats(true);
   };
 
   const handleSelectChapter = (chapterId: string) => {
     storyMode.setCurrentChapter(chapterId);
-    // Inicia o lobby Co-op para o modo história
+    // Mock player for host
+    const hostPlayer = { name: 'Host', location: 'Story Mode', score: 0, avatar: '👑' };
+    coop.createSession(hostPlayer, `Jornada ${chapterId}`, 4, chapterId);
     setShowCoopLobby(true);
   };
 
   const handleStartCoop = () => {
-    storyMode.setCurrentChapter(null); // Modo Co-op Livre
+    storyMode.setCurrentChapter(null);
+    // Mock player for host
+    const hostPlayer = { name: 'Host', location: 'Co-op Livre', score: 0, avatar: '👑' };
+    coop.createSession(hostPlayer, 'Time Bíblico', 4);
     setShowCoopLobby(true);
   };
 
   const handleCoopGameStart = () => {
     setShowCoopLobby(false);
     setGameMode('quiz');
-    // TODO: Inicializar quiz com base na sessão coop (perguntas, vidas, etc.)
-    // Por enquanto, apenas muda o modo
+    
     const playersList = coop.players.map(p => ({ name: p.name, location: p.location, score: 0, avatar: p.avatar }));
-    const numQuestions = 10; // Fixed for now
+    const numQuestions = 10; 
     const firstQuestionText = quiz.initializeGame(playersList, numQuestions);
-    setSetupMode('multiplayer'); // Trata como multiplayer para pontuação
+    setSetupMode('multiplayer'); 
     
     if (settings.isNarrationEnabled && firstQuestionText) {
       setTimeout(() => speak(firstQuestionText), 500);
@@ -132,7 +148,7 @@ const Index = () => {
   };
 
   const handleMarathonReady = (player: Player) => {
-    const firstQuestionText = quiz.initializeGame([player], 999); // Large number for marathon
+    const firstQuestionText = quiz.initializeGame([player], 999);
     setGameMode("quiz");
     setSetupMode('solo');
     achievements.unlock('start');
@@ -144,7 +160,6 @@ const Index = () => {
   const handleTournamentStart = () => {
     setSetupMode('solo');
     setShowPlayerSetup(true);
-    // Tournament uses 10 fixed questions
   };
 
   const handlePlayersReady = (players: Player[]) => {
@@ -162,13 +177,22 @@ const Index = () => {
   };
 
   const handleAnswer = (selectedIndex: number) => {
-    cancel(); // Para a narração da pergunta
+    cancel();
     const result = selectedIndex === -1 
       ? quiz.handleTimeout() 
       : quiz.answerQuestion(selectedIndex);
 
     const gainedPoints = result.pointsEarned;
     const didLevelUp = playerLevel.addScore(gainedPoints);
+    
+    // Log answer for stats
+    if (quiz.currentQuestion) {
+      const timeSpent = GAME_CONSTANTS.TIME_PER_QUESTION - result.timeRemaining;
+      stats.logAnswer(quiz.currentQuestion, result.correct, timeSpent);
+    }
+    
+    // Update daily challenge progress
+    dailyChallenge.updateProgress(gainedPoints);
     
     // Add coins for correct answers
     if (result.correct) {
@@ -232,6 +256,17 @@ const Index = () => {
         () => celebration.celebrateAchievement()
       );
 
+      // Calculate total time spent in session (approximation)
+      const totalTimeSpent = quiz.totalQuestions * GAME_CONSTANTS.TIME_PER_QUESTION - quiz.timeRemaining;
+      
+      // Log session for stats
+      stats.logSession(
+        quiz.currentPlayer?.score || 0,
+        quiz.totalQuestions - quiz.sessionWrongAnswers,
+        quiz.sessionWrongAnswers,
+        totalTimeSpent
+      );
+
       // Save to ranking if solo
       if (setupMode === 'solo' && quiz.currentPlayer && quiz.currentPlayer.score > 0) {
         ranking.addScore(quiz.currentPlayer);
@@ -292,25 +327,29 @@ const Index = () => {
 
       <div className="w-full max-w-4xl relative z-10">
         {gameMode === "menu" && (
-          <MenuScreen
-            onStartSolo={handleStartSolo}
-            onStartMultiplayer={handleStartMultiplayer}
-            onStartMarathon={handleStartMarathon}
-            onStartStudy={handleStartStudy}
-            onStartTournament={handleStartTournament}
-            onStartStory={handleStartStory}
-            onStartCoop={handleStartCoop}
-            onShowRanking={() => {
-              ranking.loadRanking();
-              setShowRanking(true);
-            }}
-            onShowAchievements={() => setShowAchievements(true)}
-            onShowPowerUpShop={() => setShowPowerUpShop(true)}
-            onShowReview={handleStartReview}
-            isReviewAvailable={reviewHistory.hasIncorrectQuestions()}
-            isNarrationEnabled={settings.isNarrationEnabled}
-            onToggleNarration={toggleNarration}
-          />
+          <>
+            <DailyChallengeCard onStartChallenge={handleStartSolo} />
+            <MenuScreen
+              onStartSolo={handleStartSolo}
+              onStartMultiplayer={handleStartMultiplayer}
+              onStartMarathon={handleStartMarathon}
+              onStartStudy={handleStartStudy}
+              onStartTournament={handleStartTournament}
+              onStartStory={handleStartStory}
+              onStartCoop={handleStartCoop}
+              onShowRanking={() => {
+                ranking.loadRanking();
+                setShowRanking(true);
+              }}
+              onShowAchievements={() => setShowAchievements(true)}
+              onShowPowerUpShop={() => setShowPowerUpShop(true)}
+              onShowReview={handleStartReview}
+              onShowStats={handleShowStats}
+              isReviewAvailable={reviewHistory.hasIncorrectQuestions()}
+              isNarrationEnabled={settings.isNarrationEnabled}
+              onToggleNarration={toggleNarration}
+            />
+          </>
         )}
         
         {gameMode === "story" && (
@@ -403,6 +442,11 @@ const Index = () => {
         shopItems={virtualShop.shopItems}
         currency={virtualShop.currency}
         onPurchase={virtualShop.purchaseItem}
+      />
+      
+      <StatsModal
+        open={showStats}
+        onClose={() => setShowStats(false)}
       />
       
       {showCoopLobby && (

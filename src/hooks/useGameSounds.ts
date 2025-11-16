@@ -124,11 +124,61 @@ export function useGameSounds() {
     });
   }, [getAudioContext]);
 
+  const playLevelUp = useCallback(() => {
+    const ctx = getAudioContext();
+    const now = ctx.currentTime;
+    
+    const notes = [440, 554.37, 659.25, 880]; // A4, C#5, E5, A5
+    const duration = 0.15;
+
+    notes.forEach((freq, i) => {
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      oscillator.type = 'triangle';
+      oscillator.frequency.setValueAtTime(freq, now + i * duration);
+      gainNode.gain.setValueAtTime(0.3, now + i * duration);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + i * duration + duration);
+      
+      oscillator.start(now + i * duration);
+      oscillator.stop(now + i * duration + duration);
+    });
+  }, [getAudioContext]);
+
+  const playCombo = useCallback((comboCount: number) => {
+    const ctx = getAudioContext();
+    const now = ctx.currentTime;
+    
+    const baseFreq = 440;
+    const freq = baseFreq * (1 + comboCount * 0.05); // Aumenta o tom com o combo
+    const duration = 0.1;
+
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(freq, now);
+    
+    gainNode.gain.setValueAtTime(0.15, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration);
+    
+    oscillator.start(now);
+    oscillator.stop(now + duration);
+  }, [getAudioContext]);
+
   return {
     playCorrect,
     playWrong,
     playAchievement,
     playTimerWarning,
     playVictory,
+    playLevelUp,
+    playCombo,
   };
 }

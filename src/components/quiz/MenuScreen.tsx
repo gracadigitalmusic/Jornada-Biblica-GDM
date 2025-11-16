@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Trophy, Users, User, Zap, Target, Award, BookOpen, Flame, GraduationCap, Medal, BookMarked, Volume2, VolumeX } from "lucide-react";
+import { Trophy, Users, User, Zap, Target, Award, BookOpen, Flame, GraduationCap, Medal, BookMarked, Volume2, VolumeX, TrendingUp } from "lucide-react";
 import { TOTAL_QUESTIONS } from "@/data/questions";
 import { PlayerLevelCard } from "./PlayerLevelCard";
 import { BadgesDisplay } from "./BadgesDisplay";
 import { OfflineMode } from "./OfflineMode";
+import { DailyChallengeCard } from "./DailyChallengeCard";
 
 interface MenuScreenProps {
   onStartSolo: () => void;
@@ -18,6 +19,7 @@ interface MenuScreenProps {
   onShowAchievements: () => void;
   onShowPowerUpShop: () => void;
   onShowReview: () => void;
+  onShowStats: () => void; // Novo
   isReviewAvailable: boolean;
   isNarrationEnabled: boolean;
   onToggleNarration: () => void;
@@ -35,6 +37,7 @@ export function MenuScreen({
   onShowAchievements, 
   onShowPowerUpShop,
   onShowReview,
+  onShowStats, // Novo
   isReviewAvailable,
   isNarrationEnabled,
   onToggleNarration
@@ -127,6 +130,7 @@ export function MenuScreen({
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="flex flex-col sm:flex-row gap-3 justify-center">
         <Button onClick={onShowRanking} variant="outline" size="lg"><Trophy className="w-4 h-4 mr-2" />Ranking</Button>
         <Button onClick={onShowAchievements} variant="outline" size="lg"><Award className="w-4 h-4 mr-2" />Conquistas</Button>
+        <Button onClick={onShowStats} variant="outline" size="lg"><TrendingUp className="w-4 h-4 mr-2" />Estatísticas</Button>
         <Button onClick={onShowPowerUpShop} variant="outline" size="lg"><Zap className="w-4 h-4 mr-2" />Loja</Button>
         {isReviewAvailable && <Button onClick={onShowReview} variant="outline" size="lg"><BookOpen className="w-4 h-4 mr-2" />Revisar</Button>}
       </motion.div>

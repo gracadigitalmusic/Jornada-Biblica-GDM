@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Player } from '@/types/quiz';
 import { useToast } from './use-toast';
@@ -25,6 +25,7 @@ export function useCoopMode() {
   const [session, setSession] = useState<CoopSession | null>(null);
   const [players, setPlayers] = useState<CoopPlayer[]>([]);
   const [isHost, setIsHost] = useState(false);
+  const [myUserId, setMyUserId] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -51,7 +52,7 @@ export function useCoopMode() {
       .on(
         'presence',
         { event: 'join' },
-        ({ key, newPresences }) => {
+        ({ newPresences }) => {
           const newPlayer = (newPresences[0] as any).payload as CoopPlayer;
           toast({
             title: "Novo jogador!",
@@ -62,7 +63,7 @@ export function useCoopMode() {
       .on(
         'presence',
         { event: 'leave' },
-        ({ key, leftPresences }) => {
+        ({ leftPresences }) => {
           const leftPlayer = (leftPresences[0] as any).payload as CoopPlayer;
           toast({
             title: "Jogador saiu",
@@ -105,10 +106,13 @@ export function useCoopMode() {
     maxPlayers: number,
     chapterId?: string
   ) => {
+    const userId = crypto.randomUUID();
     const sessionId = crypto.randomUUID();
+    setMyUserId(userId);
+    
     const newSession: CoopSession = {
       id: sessionId,
-      hostId: sessionId,
+      hostId: userId, // Host is now identified by their userId
       teamName,
       maxPlayers,
       currentPlayers: [hostPlayer],
@@ -127,7 +131,7 @@ export function useCoopMode() {
       if (status === 'SUBSCRIBED') {
         await channel.track({
           ...hostPlayer,
-          userId: sessionId,
+          userId: userId,
           isReady: false,
         } as CoopPlayer);
       }
@@ -141,6 +145,7 @@ export function useCoopMode() {
     player: Player
   ) => {
     const userId = crypto.randomUUID();
+    setMyUserId(userId);
     const channel = supabase.channel(`coop-session-${sessionId}`);
     
     await channel.subscribe(async (status) => {
@@ -156,7 +161,7 @@ export function useCoopMode() {
     // Mock session for now - in production, fetch from database
     setSession({
       id: sessionId,
-      hostId: '',
+      hostId: '', // Will be updated by presence sync if host is present
       teamName: 'Team',
       maxPlayers: 4,
       currentPlayers: [],
@@ -170,18 +175,18 @@ export function useCoopMode() {
   }, []);
 
   const toggleReady = useCallback(async () => {
-    if (!session) return;
+    if (!session || !myUserId) return;
     
     const channel = supabase.channel(`coop-session-${session.id}`);
-    const currentPresence = players.find(p => p.isReady === false);
+    const currentPresence = players.find(p => p.userId === myUserId);
     
     if (currentPresence) {
       await channel.track({
         ...currentPresence,
-        isReady: true,
+        isReady: !currentPresence.isReady,
       });
     }
-  }, [session, players]);
+  }, [session, players, myUserId]);
 
   const startGame = useCallback(async () => {
     if (!session || !isHost) return;
@@ -256,12 +261,18 @@ export function useCoopMode() {
     setSession(null);
     setPlayers([]);
     setIsHost(false);
+    setMyUserId(null);
   }, [session]);
+
+  const currentPlayer = useMemo(() => {
+    return players.find(p => p.userId === myUserId) || null;
+  }, [players, myUserId]);
 
   return {
     session,
     players,
     isHost,
+    currentPlayer, // Exportando o jogador atual
     createSession,
     joinSession,
     toggleReady,
