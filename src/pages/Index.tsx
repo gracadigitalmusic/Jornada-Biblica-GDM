@@ -30,7 +30,7 @@ import { CoopLobby } from "@/components/quiz/CoopLobby";
 import { useCoopMode } from "@/hooks/useCoopMode";
 import { StatsModal } from "@/components/quiz/StatsModal";
 import { DailyChallengeCard } from "@/components/quiz/DailyChallengeCard";
-import { FALLBACK_QUESTIONS, GAME_CONSTANTS } from "@/data/questions";
+import { GAME_CONSTANTS } from "@/data/questions";
 
 const Index = () => {
   const [gameMode, setGameMode] = useState<GameMode>("menu");
@@ -358,31 +358,28 @@ const Index = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
       </div>
 
-      <div className="w-full max-w-4xl relative z-10">
+      <div className="w-full max-w-6xl relative z-10">
         {gameMode === "menu" && (
-          <>
-            <DailyChallengeCard onStartChallenge={handleStartSolo} onClaimReward={handleClaimDailyReward} />
-            <MenuScreen
-              onStartSolo={handleStartSolo}
-              onStartMultiplayer={handleStartMultiplayer}
-              onStartMarathon={handleStartMarathon}
-              onStartStudy={handleStartStudy}
-              onStartTournament={handleStartTournament}
-              onStartStory={handleStartStory}
-              onStartCoop={handleStartCoop}
-              onShowRanking={() => {
-                ranking.loadRanking();
-                setShowRanking(true);
-              }}
-              onShowAchievements={() => setShowAchievements(true)}
-              onShowPowerUpShop={() => setShowPowerUpShop(true)}
-              onShowReview={handleStartReview}
-              onShowStats={handleShowStats}
-              isReviewAvailable={reviewHistory.hasIncorrectQuestions()}
-              isNarrationEnabled={settings.isNarrationEnabled}
-              onToggleNarration={toggleNarration}
-            />
-          </>
+          <MenuScreen
+            onStartSolo={handleStartSolo}
+            onStartMultiplayer={handleStartMultiplayer}
+            onStartMarathon={handleStartMarathon}
+            onStartStudy={handleStartStudy}
+            onStartTournament={handleStartTournament}
+            onStartStory={handleStartStory}
+            onStartCoop={handleStartCoop}
+            onShowRanking={() => {
+              ranking.loadRanking();
+              setShowRanking(true);
+            }}
+            onShowAchievements={() => setShowAchievements(true)}
+            onShowPowerUpShop={() => setShowPowerUpShop(true)}
+            onShowReview={handleStartReview}
+            onShowStats={handleShowStats}
+            isReviewAvailable={reviewHistory.hasIncorrectQuestions()}
+            isNarrationEnabled={settings.isNarrationEnabled}
+            onToggleNarration={toggleNarration}
+          />
         )}
         
         {gameMode === "story" && (
