@@ -88,7 +88,7 @@ export function MarathonMode({ onStart, onBack }: MarathonModeProps) {
                   <button
                     key={avatar}
                     onClick={() => setSelectedAvatar(avatar)}
-                    className={`text-3xl p-2 rounded-lg transition-all ${
+                    className={`text-3xl p-2 rounded-lg transition-all flex items-center justify-center ${
                       selectedAvatar === avatar
                         ? 'bg-primary/20 ring-2 ring-primary scale-110'
                         : 'bg-background hover:bg-muted border border-border'
