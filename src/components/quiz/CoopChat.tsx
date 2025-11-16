@@ -23,8 +23,9 @@ interface CoopChatProps {
 export function CoopChat({ session, currentPlayer }: CoopChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const scrollRef = useRef<HTMLDivElement>(null); // Usaremos esta ref para o elemento de rolagem
+  const scrollRef = useRef<HTMLDivElement>(null);
 
+  // 1. Configuração do Canal Supabase para Broadcast
   useEffect(() => {
     const channel = supabase.channel(`coop-chat-${session.id}`);
 
@@ -43,9 +44,10 @@ export function CoopChat({ session, currentPlayer }: CoopChatProps) {
     };
   }, [session.id]);
 
+  // 2. Rolagem automática para a última mensagem
   useEffect(() => {
-    // Rola para o final quando novas mensagens chegam
     if (scrollRef.current) {
+      // Acessa o viewport interno do ScrollArea (Radix UI)
       const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
       if (viewport) {
         viewport.scrollTop = viewport.scrollHeight;
@@ -53,6 +55,7 @@ export function CoopChat({ session, currentPlayer }: CoopChatProps) {
     }
   }, [messages]);
 
+  // 3. Envio de Mensagem
   const handleSend = async () => {
     if (!input.trim()) return;
 
