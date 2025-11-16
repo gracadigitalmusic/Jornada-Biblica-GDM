@@ -29,7 +29,8 @@ export function ConnectionStatus() {
 
   return (
     <TooltipProvider>
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-2"> {/* Adicionado 'flex items-center gap-2' aqui */}
+      {/* Container para o Status Online/Offline (Canto Superior Esquerdo) */}
+      <div className="fixed top-4 left-4 z-50 flex items-center gap-2">
         {/* Status da Conexão */}
         <Tooltip>
           <TooltipTrigger asChild>
@@ -61,8 +62,33 @@ export function ConnectionStatus() {
             </p>
           </TooltipContent>
         </Tooltip>
+        
+        {/* Notificação de mudança de status (próximo ao status principal) */}
+        <AnimatePresence>
+          {showNotification && (
+            <motion.div
+              initial={{ x: -100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -100, opacity: 0 }}
+              className="absolute left-0 top-12 bg-card border border-border rounded-lg shadow-lg p-3 min-w-[200px]"
+            >
+              <p className="text-sm font-medium">
+                {isOffline ? "🔴 Você está offline" : "🟢 Conectado novamente"}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {isOffline && isDataCached
+                  ? "Modo offline ativo com dados salvos"
+                  : isOffline
+                  ? "Algumas funcionalidades podem estar limitadas"
+                  : "Todas as funcionalidades disponíveis"}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-        {/* Status do Cache */}
+      {/* Status do Cache (Canto Superior Direito) */}
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
         {isDataCached && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -82,29 +108,6 @@ export function ConnectionStatus() {
             </TooltipContent>
           </Tooltip>
         )}
-
-        {/* Notificação de mudança de status */}
-        <AnimatePresence>
-          {showNotification && (
-            <motion.div
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: 100, opacity: 0 }}
-              className="absolute right-0 top-12 bg-card border border-border rounded-lg shadow-lg p-3 min-w-[200px]"
-            >
-              <p className="text-sm font-medium">
-                {isOffline ? "🔴 Você está offline" : "🟢 Conectado novamente"}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {isOffline && isDataCached
-                  ? "Modo offline ativo com dados salvos"
-                  : isOffline
-                  ? "Algumas funcionalidades podem estar limitadas"
-                  : "Todas as funcionalidades disponíveis"}
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </TooltipProvider>
   );
