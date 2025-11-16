@@ -80,7 +80,7 @@ export function QuizScreen({
     if (timeRemaining <= 0 && selectedIndex === null) {
       handleTimeout();
     }
-  }, [timeRemaining, showFeedback, playTimerWarning]);
+  }, [timeRemaining, showFeedback, playTimerWarning, selectedIndex]);
 
   const handleHint = () => {
     const indicesToDisable = onUseHint();
@@ -108,9 +108,9 @@ export function QuizScreen({
       playCorrect();
       // Celebration effects for correct answers
       if (combo >= 5) {
-        celebratePowerUp();
+        celebratePowerUp(); // Usando powerUp celebration para combos altos
       } else if (combo >= 3) {
-        celebrateAchievement();
+        celebrateAchievement(); // Usando achievement celebration para combos médios
       }
     } else {
       playWrong();
@@ -121,7 +121,7 @@ export function QuizScreen({
     // Narrate explanation after answer
     if (isNarrationEnabled && question.explanation) {
       setTimeout(() => {
-        const narrateText = `${question.reference}. ${question.explanation}`;
+        const narrateText = `A resposta correta é: ${question.options[question.answer]}. ${question.explanation}`;
         onNarrate(narrateText);
       }, 1000);
     }
@@ -222,7 +222,7 @@ export function QuizScreen({
               className="gap-2"
             >
               <Lightbulb className={`w-5 h-5 ${hints > 0 ? 'text-secondary' : 'text-muted'}`} />
-              <span className="text-xs">Dica</span>
+              <span className="text-xs">Dica ({hints})</span>
             </Button>
 
             <span className="text-sm text-muted-foreground">
@@ -408,7 +408,7 @@ export function QuizScreen({
           <Button 
             size="lg" 
             onClick={onNextQuestion}
-            className="font-bold text-lg px-8"
+            className="font-bold text-lg px-8 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
           >
             Próxima Pergunta →
           </Button>

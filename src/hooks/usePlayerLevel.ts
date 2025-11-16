@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { PlayerLevel } from '@/types/quiz';
+import { toast } from '@/hooks/use-toast';
 
 const LEVELS: PlayerLevel[] = [
   { level: 1, title: "Iniciante", minScore: 0, benefits: ["Bem-vindo à jornada!"], extraLives: 0, extraHints: 0 },
@@ -40,10 +41,17 @@ export function usePlayerLevel() {
     
     // Check if leveled up
     const newLevel = LEVELS.find(l => newScore >= l.minScore && newScore < (LEVELS[LEVELS.findIndex(x => x === l) + 1]?.minScore || Infinity));
+    
+    let leveledUp = false;
     if (newLevel && newLevel.level > oldLevel) {
-      return true; // Leveled up!
+      leveledUp = true;
+      toast({
+        title: `🎉 Nível ${newLevel.level} Desbloqueado!`,
+        description: `Parabéns, você agora é um(a) ${newLevel.title}!`,
+        duration: 5000,
+      });
     }
-    return false;
+    return leveledUp;
   }, [totalScore, currentLevel, updateLevel]);
 
   const getNextLevel = useCallback(() => {

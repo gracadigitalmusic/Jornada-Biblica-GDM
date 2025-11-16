@@ -34,6 +34,7 @@ export interface AchievementData {
   maxCombo: number;
   unlocked: Set<string>;
   totalSessions: number;
+  storyChaptersCompleted: number; // Adicionado para rastrear o progresso da história
 }
 
 export interface RankingEntry {

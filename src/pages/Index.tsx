@@ -25,6 +25,7 @@ import { StoryModeScreen } from "@/components/quiz/StoryModeScreen";
 import { VirtualShop } from "@/components/quiz/VirtualShop";
 import { AICompanion } from "@/components/quiz/AICompanion";
 import { CoopLobby } from "@/components/quiz/CoopLobby";
+import { useCoopMode } from "@/hooks/useCoopMode";
 
 const Index = () => {
   const [gameMode, setGameMode] = useState<GameMode>("menu");
@@ -48,6 +49,7 @@ const Index = () => {
   const { speak, cancel } = useNarration();
   const storyMode = useStoryMode();
   const virtualShop = useVirtualShop();
+  const coop = useCoopMode(); // Novo hook para Co-op
 
   // Check for timeout
   useEffect(() => {
@@ -99,26 +101,40 @@ const Index = () => {
 
   const handleSelectChapter = (chapterId: string) => {
     storyMode.setCurrentChapter(chapterId);
-    // Start co-op mode for story chapters
+    // Inicia o lobby Co-op para o modo história
     setShowCoopLobby(true);
   };
 
   const handleStartCoop = () => {
+    storyMode.setCurrentChapter(null); // Modo Co-op Livre
     setShowCoopLobby(true);
   };
 
   const handleCoopGameStart = () => {
     setShowCoopLobby(false);
     setGameMode('quiz');
+    // TODO: Inicializar quiz com base na sessão coop (perguntas, vidas, etc.)
+    // Por enquanto, apenas muda o modo
+    const playersList = coop.players.map(p => ({ name: p.name, location: p.location, score: 0, avatar: p.avatar }));
+    const numQuestions = 10; // Fixed for now
+    const firstQuestionText = quiz.initializeGame(playersList, numQuestions);
+    setSetupMode('multiplayer'); // Trata como multiplayer para pontuação
+    
+    if (settings.isNarrationEnabled && firstQuestionText) {
+      setTimeout(() => speak(firstQuestionText), 500);
+    }
   };
 
   const handleCancelCoop = () => {
+    coop.leaveSession();
     setShowCoopLobby(false);
+    setGameMode('menu');
   };
 
   const handleMarathonReady = (player: Player) => {
     const firstQuestionText = quiz.initializeGame([player], 999); // Large number for marathon
     setGameMode("quiz");
+    setSetupMode('solo');
     achievements.unlock('start');
     if (settings.isNarrationEnabled && firstQuestionText) {
       setTimeout(() => speak(firstQuestionText), 500);
@@ -220,9 +236,10 @@ const Index = () => {
       if (setupMode === 'solo' && quiz.currentPlayer && quiz.currentPlayer.score > 0) {
         ranking.addScore(quiz.currentPlayer);
         
-      const leveledUp = playerLevel.addScore(quiz.currentPlayer.score);
-      if (leveledUp) {
-        setTimeout(() => celebration.celebrateLevelUp(), 500);
+        const leveledUp = playerLevel.addScore(quiz.currentPlayer.score);
+        if (leveledUp) {
+          setTimeout(() => celebration.celebrateLevelUp(), 500);
+        }
       }
       
       // Check for story chapter completion
@@ -240,7 +257,6 @@ const Index = () => {
       
       if (quiz.sessionWrongAnswers === 0) {
         setTimeout(() => celebration.celebrateVictory(), 1000);
-      }
       }
     }
 
@@ -294,6 +310,15 @@ const Index = () => {
             isReviewAvailable={reviewHistory.hasIncorrectQuestions()}
             isNarrationEnabled={settings.isNarrationEnabled}
             onToggleNarration={toggleNarration}
+          />
+        )}
+        
+        {gameMode === "story" && (
+          <StoryModeScreen
+            chapters={storyMode.chapters}
+            onSelectChapter={handleSelectChapter}
+            onBack={() => setGameMode("menu")}
+            totalScore={playerLevel.totalScore}
           />
         )}
 
@@ -370,11 +395,6 @@ const Index = () => {
         open={showAchievements}
         onClose={() => setShowAchievements(false)}
         achievements={achievements.getAchievements()}
-      />
-
-      <PowerUpShop 
-        open={showPowerUpShop} 
-        onClose={() => setShowPowerUpShop(false)} 
       />
 
       <VirtualShop

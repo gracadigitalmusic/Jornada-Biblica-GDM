@@ -49,6 +49,7 @@ export function useAchievements() {
     maxCombo: 0,
     unlocked: new Set<string>(),
     totalSessions: 0,
+    storyChaptersCompleted: 0, // Novo campo para rastrear o progresso da história
   });
 
   useEffect(() => {
@@ -59,6 +60,7 @@ export function useAchievements() {
         setData({
           ...parsed,
           unlocked: new Set(parsed.unlocked || []),
+          storyChaptersCompleted: parsed.storyChaptersCompleted || 0,
         });
       }
     } catch (error) {
@@ -180,6 +182,15 @@ export function useAchievements() {
     if (perfect) unlock('story_perfect', onCelebrate);
     if (noDeath) unlock('story_no_death', onCelebrate);
     
+    // Track total chapters completed
+    if (!data.unlocked.has(`story_${chapterId}`)) {
+      newData.storyChaptersCompleted = (newData.storyChaptersCompleted || 0) + 1;
+    }
+    
+    if (newData.storyChaptersCompleted >= 6) { // Assuming 6 chapters total
+      unlock('story_all', onCelebrate);
+    }
+    
     save(newData);
   }, [data, save, unlock]);
 
@@ -193,6 +204,12 @@ export function useAchievements() {
     if (!data.unlocked.has('coop_first')) {
       unlock('coop_first', onCelebrate);
     }
+    
+    // Mocking coop win count for now
+    // if (won) {
+    //   newData.totalCoopWins = (newData.totalCoopWins || 0) + 1;
+    //   if (newData.totalCoopWins === 5) unlock('coop_win_5', onCelebrate);
+    // }
     
     if (won && perfect) {
       unlock('coop_perfect', onCelebrate);
