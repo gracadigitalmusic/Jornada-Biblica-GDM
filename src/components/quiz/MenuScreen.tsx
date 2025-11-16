@@ -21,6 +21,7 @@ interface MenuScreenProps {
   onShowPowerUpShop: () => void;
   onShowReview: () => void;
   onShowStats: () => void;
+  onShowProfile: () => void; // Novo prop
   isReviewAvailable: boolean;
   isNarrationEnabled: boolean;
   onToggleNarration: () => void;
@@ -77,6 +78,7 @@ export function MenuScreen({
   onShowPowerUpShop,
   onShowReview,
   onShowStats,
+  onShowProfile, // Usando o novo prop
   isReviewAvailable,
   isNarrationEnabled,
   onToggleNarration
@@ -86,7 +88,7 @@ export function MenuScreen({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="text-center space-y-8 relative max-w-6xl mx-auto"
+      className="text-center space-y-8 relative max-w-4xl mx-auto" // Reduzindo max-width para centralizar melhor
     >
       {/* Top Bar & Logo */}
       <div className="flex flex-col items-center justify-center mb-8">
@@ -105,7 +107,7 @@ export function MenuScreen({
           <img 
             src="/logo_jogo.png" 
             alt="Jornada Bíblica Logo" 
-            className="w-32 h-32 md:w-40 md:h-40 object-contain animate-logo-pulse"
+            className="w-28 h-28 md:w-32 md:h-32 object-contain animate-logo-pulse" // Reduzindo o tamanho da logo
           />
           <h1 className="text-4xl md:text-5xl font-black mt-2 tracking-tight" style={{ fontFamily: "'Orbitron', sans-serif" }}>
             <span className="text-gradient-primary">JORNADA</span><br /><span className="text-gradient-secondary">BÍBLICA</span>
@@ -114,117 +116,94 @@ export function MenuScreen({
         </motion.div>
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Main Content Grid - Agora apenas Modos de Jogo */}
+      <div className="grid grid-cols-1 gap-6">
         
-        {/* Coluna 1: Status e Desafios */}
-        <div className="lg:col-span-1 space-y-6">
-          <Card className="p-4 bg-quiz-card/50 backdrop-blur border-primary/20">
-            <CardHeader className="p-0 pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <LayoutGrid className="w-5 h-5 text-primary" />
-                Seu Status
-              </CardTitle>
-            </CardHeader>
-            <div className="space-y-3">
-              <PlayerLevelCard />
-              <BadgesDisplay />
-            </div>
-          </Card>
-          
-          <DailyChallengeCard onStartChallenge={onStartSolo} onClaimReward={() => {}} />
-          <OfflineMode />
-        </div>
+        {/* Modos Competitivos */}
+        <Card className="p-6 bg-quiz-card/50 backdrop-blur border-secondary/20">
+          <CardTitle className="text-xl font-bold mb-4 flex items-center gap-2 text-gradient-secondary">
+            <Trophy className="w-6 h-6" />
+            Modos Competitivos
+          </CardTitle>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <ModeButton
+              icon={<User className="w-6 h-6 text-primary" />}
+              title="Solo Rápido"
+              subtitle="10 perguntas, ranking local"
+              onClick={onStartSolo}
+              delay={0.4}
+              colorClass="border-primary"
+            />
+            <ModeButton
+              icon={<Flame className="w-6 h-6 text-destructive" />}
+              title="Maratona"
+              subtitle="Infinito, até perder 3 vidas"
+              onClick={onStartMarathon}
+              delay={0.6}
+              colorClass="border-destructive"
+            />
+            <ModeButton
+              icon={<Medal className="w-6 h-6 text-primary" />}
+              title="Torneio Semanal"
+              subtitle="Competição global de 10 perguntas"
+              onClick={onStartTournament}
+              delay={0.7}
+              colorClass="border-primary"
+            />
+            <ModeButton
+              icon={<Users className="w-6 h-6 text-secondary" />}
+              title="Multiplayer Local"
+              subtitle="Batalha de 2 a 5 jogadores"
+              onClick={onStartMultiplayer}
+              delay={0.5}
+              colorClass="border-secondary"
+            />
+          </div>
+        </Card>
 
-        {/* Coluna 2 & 3: Modos de Jogo */}
-        <div className="lg:col-span-2 space-y-6">
-          
-          {/* Modos Competitivos */}
-          <Card className="p-6 bg-quiz-card/50 backdrop-blur border-secondary/20">
-            <CardTitle className="text-xl font-bold mb-4 flex items-center gap-2 text-gradient-secondary">
-              <Trophy className="w-6 h-6" />
-              Modos Competitivos
-            </CardTitle>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Modos de Aprendizado e Narrativa */}
+        <Card className="p-6 bg-quiz-card/50 backdrop-blur border-success/20">
+          <CardTitle className="text-xl font-bold mb-4 flex items-center gap-2 text-gradient-success">
+            <BookMarked className="w-6 h-6" />
+            Aprendizado & História
+          </CardTitle>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <ModeButton
+              icon={<BookMarked className="w-6 h-6 text-primary" />}
+              title="Modo História"
+              subtitle="Jornada narrativa imersiva"
+              onClick={onStartStory}
+              delay={0.9}
+              colorClass="border-primary"
+            />
+            <ModeButton
+              icon={<BookOpen className="w-6 h-6 text-success" />}
+              title="Modo Estudo"
+              subtitle="Sem pressão, por categoria"
+              onClick={onStartStudy}
+              delay={0.8}
+              colorClass="border-success"
+            />
+            {isReviewAvailable && (
               <ModeButton
-                icon={<User className="w-6 h-6 text-primary" />}
-                title="Solo Rápido"
-                subtitle="10 perguntas, ranking local"
-                onClick={onStartSolo}
-                delay={0.4}
-                colorClass="border-primary"
-              />
-              <ModeButton
-                icon={<Users className="w-6 h-6 text-secondary" />}
-                title="Multiplayer Local"
-                subtitle="Batalha de 2 a 5 jogadores"
-                onClick={onStartMultiplayer}
-                delay={0.5}
+                icon={<GraduationCap className="w-6 h-6 text-secondary" />}
+                title="Revisar Erros"
+                subtitle="Estude as perguntas que errou"
+                onClick={onShowReview}
+                delay={1.1}
                 colorClass="border-secondary"
               />
-              <ModeButton
-                icon={<Flame className="w-6 h-6 text-destructive" />}
-                title="Maratona"
-                subtitle="Infinito, até perder 3 vidas"
-                onClick={onStartMarathon}
-                delay={0.6}
-                colorClass="border-destructive"
-              />
-              <ModeButton
-                icon={<Medal className="w-6 h-6 text-primary" />}
-                title="Torneio Semanal"
-                subtitle="Competição global de 10 perguntas"
-                onClick={onStartTournament}
-                delay={0.7}
-                colorClass="border-primary"
-              />
-            </div>
-          </Card>
-
-          {/* Modos de Aprendizado e Narrativa */}
-          <Card className="p-6 bg-quiz-card/50 backdrop-blur border-success/20">
-            <CardTitle className="text-xl font-bold mb-4 flex items-center gap-2 text-gradient-success">
-              <BookMarked className="w-6 h-6" />
-              Aprendizado & História
-            </CardTitle>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <ModeButton
-                icon={<BookOpen className="w-6 h-6 text-success" />}
-                title="Modo Estudo"
-                subtitle="Sem pressão, por categoria"
-                onClick={onStartStudy}
-                delay={0.8}
-                colorClass="border-success"
-              />
-              <ModeButton
-                icon={<BookMarked className="w-6 h-6 text-primary" />}
-                title="Modo História"
-                subtitle="Jornada narrativa imersiva"
-                onClick={onStartStory}
-                delay={0.9}
-                colorClass="border-primary"
-              />
-              <ModeButton
-                icon={<Users className="w-6 h-6 text-primary" />}
-                title="Co-op Online"
-                subtitle="Jogue em equipe (Beta)"
-                onClick={onStartCoop}
-                delay={1.0}
-                colorClass="border-primary"
-              />
-              {isReviewAvailable && (
-                <ModeButton
-                  icon={<GraduationCap className="w-6 h-6 text-secondary" />}
-                  title="Revisar Erros"
-                  subtitle="Estude as perguntas que errou"
-                  onClick={onShowReview}
-                  delay={1.1}
-                  colorClass="border-secondary"
-                />
-              )}
-            </div>
-          </Card>
-        </div>
+            )}
+            <ModeButton
+              icon={<Users className="w-6 h-6 text-primary" />}
+              title="Co-op Online"
+              subtitle="Jogue em equipe (Beta)"
+              onClick={onStartCoop}
+              delay={1.0}
+              colorClass="border-primary"
+            />
+          </div>
+        </Card>
       </div>
 
       {/* Rodapé de Ferramentas */}
@@ -234,8 +213,11 @@ export function MenuScreen({
         transition={{ delay: 1.2 }} 
         className="mt-8 pt-4 border-t border-border/50"
       >
-        <h3 className="text-lg font-bold mb-4 text-muted-foreground">Ferramentas</h3>
+        <h3 className="text-lg font-bold mb-4 text-muted-foreground">Ferramentas e Perfil</h3>
         <div className="flex flex-wrap justify-center gap-4">
+          <Button onClick={onShowProfile} variant="outline" size="lg" className="gap-2">
+            <User className="w-4 h-4" />Perfil & Status
+          </Button>
           <Button onClick={onShowRanking} variant="outline" size="lg" className="gap-2">
             <Trophy className="w-4 h-4" />Ranking
           </Button>

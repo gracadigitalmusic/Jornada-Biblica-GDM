@@ -30,6 +30,7 @@ import { CoopLobby } from "@/components/quiz/CoopLobby";
 import { useCoopMode } from "@/hooks/useCoopMode";
 import { StatsModal } from "@/components/quiz/StatsModal";
 import { DailyChallengeCard } from "@/components/quiz/DailyChallengeCard";
+import { ProfileModal } from "@/components/quiz/ProfileModal"; // Importando o novo modal
 import { GAME_CONSTANTS } from "@/data/questions";
 
 const Index = () => {
@@ -44,6 +45,7 @@ const Index = () => {
   const [showNextButton, setShowNextButton] = useState(false);
   const [showCoopLobby, setShowCoopLobby] = useState(false);
   const [showStats, setShowStats] = useState(false);
+  const [showProfile, setShowProfile] = useState(false); // Novo estado
 
   const quiz = useQuizGame();
   const achievements = useAchievements();
@@ -196,6 +198,10 @@ const Index = () => {
   
   const handleShowStats = () => {
     setShowStats(true);
+  };
+
+  const handleShowProfile = () => {
+    setShowProfile(true);
   };
 
   const handleSelectChapter = (chapterId: string) => {
@@ -376,6 +382,7 @@ const Index = () => {
             onShowPowerUpShop={() => setShowPowerUpShop(true)}
             onShowReview={handleStartReview}
             onShowStats={handleShowStats}
+            onShowProfile={handleShowProfile} // Passando o novo handler
             isReviewAvailable={reviewHistory.hasIncorrectQuestions()}
             isNarrationEnabled={settings.isNarrationEnabled}
             onToggleNarration={toggleNarration}
@@ -485,6 +492,14 @@ const Index = () => {
           onCancel={handleCancelCoop}
         />
       )}
+
+      {/* Novo Modal de Perfil */}
+      <ProfileModal
+        open={showProfile}
+        onClose={() => setShowProfile(false)}
+        onStartChallenge={handleStartSolo}
+        onClaimReward={handleClaimDailyReward}
+      />
 
       {/* AI Companion - sempre disponível */}
       <AICompanion />
