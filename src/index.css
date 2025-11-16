@@ -177,6 +177,11 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-glow-success);
   }
   
+  /* Definindo glow para destructive */
+  .glow-destructive {
+    box-shadow: 0 0 30px hsl(var(--destructive) / 0.5);
+  }
+  
   .animate-glow {
     animation: glow-pulse 2s ease-in-out infinite;
   }
