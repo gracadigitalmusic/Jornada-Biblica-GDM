@@ -60,8 +60,18 @@ export function MenuScreen({
         <BadgesDisplay />
       </div>
 
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }} className="mb-12">
-        <h1 className="text-6xl md:text-7xl font-black mb-4 tracking-tight" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+      <motion.div 
+        initial={{ scale: 0.9, opacity: 0 }} 
+        animate={{ scale: 1, opacity: 1 }} 
+        transition={{ delay: 0.2, duration: 0.5 }} 
+        className="mb-12 flex flex-col items-center"
+      >
+        <img 
+          src="/logo_jogo.png" 
+          alt="Jornada Bíblica Logo" 
+          className="w-48 h-48 md:w-64 md:h-64 object-contain animate-logo-pulse"
+        />
+        <h1 className="text-4xl md:text-5xl font-black mt-4 tracking-tight" style={{ fontFamily: "'Orbitron', sans-serif" }}>
           <span className="text-gradient-primary">JORNADA</span><br /><span className="text-gradient-secondary">BÍBLICA</span>
         </h1>
         <p className="text-xl md:text-2xl text-muted-foreground font-medium">Teste seu conhecimento das Escrituras</p>

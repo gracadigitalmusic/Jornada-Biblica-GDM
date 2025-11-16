@@ -273,7 +273,7 @@ const Index = () => {
         
         const leveledUp = playerLevel.addScore(quiz.currentPlayer.score);
         if (leveledUp) {
-          setTimeout(() => celebration.celebrateLevelUp(), 500);
+          setTimeout(() => celebration.playLevelUp(), 500);
         }
       }
       
@@ -315,6 +315,19 @@ const Index = () => {
       handleEndGame();
     }
   };
+  
+  const handleClaimDailyReward = () => {
+    const reward = dailyChallenge.claimReward();
+    if (reward.coins > 0) {
+      virtualShop.addCoins(reward.coins);
+      if (reward.item) {
+        // Note: Since the item is defined in the challenge hook, we need to ensure it's added to owned items.
+        // For simplicity, we assume the item ID is sufficient for the shop to recognize it.
+        virtualShop.purchaseItem(reward.item.id); 
+      }
+      celebration.celebrateAchievement();
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
@@ -328,7 +341,7 @@ const Index = () => {
       <div className="w-full max-w-4xl relative z-10">
         {gameMode === "menu" && (
           <>
-            <DailyChallengeCard onStartChallenge={handleStartSolo} />
+            <DailyChallengeCard onStartChallenge={handleStartSolo} onClaimReward={handleClaimDailyReward} />
             <MenuScreen
               onStartSolo={handleStartSolo}
               onStartMultiplayer={handleStartMultiplayer}

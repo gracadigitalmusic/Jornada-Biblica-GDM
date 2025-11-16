@@ -9,11 +9,11 @@ import { useToast } from '@/hooks/use-toast';
 
 interface DailyChallengeCardProps {
   onStartChallenge: () => void;
+  onClaimReward: () => void;
 }
 
-export function DailyChallengeCard({ onStartChallenge }: DailyChallengeCardProps) {
-  const { challenge, claimReward } = useDailyChallenge();
-  const { addCoins, purchaseItem } = useVirtualShop();
+export function DailyChallengeCard({ onStartChallenge, onClaimReward }: DailyChallengeCardProps) {
+  const { challenge } = useDailyChallenge();
   const { toast } = useToast();
 
   if (!challenge) return null;
@@ -21,24 +21,14 @@ export function DailyChallengeCard({ onStartChallenge }: DailyChallengeCardProps
   const progressPercent = (challenge.currentProgress / challenge.targetScore) * 100;
 
   const handleClaimReward = () => {
-    const reward = claimReward();
-    if (reward.coins > 0) {
-      addCoins(reward.coins);
-      
-      let itemMessage = '';
-      if (reward.item) {
-        // Simula a compra do item (se for um item da loja)
-        // Nota: A lógica de compra de item deve ser ajustada para lidar com itens de recompensa
-        // Por simplicidade, vamos apenas notificar o item.
-        itemMessage = ` e o item ${reward.item.name}`;
-      }
-
-      toast({
-        title: "Recompensa Resgatada! 💰",
-        description: `Você recebeu ${reward.coins} moedas${itemMessage}.`,
-        duration: 5000,
-      });
-    }
+    // A lógica de adicionar moedas e itens está agora no Index.tsx
+    onClaimReward();
+    
+    toast({
+      title: "Recompensa Resgatada! 💰",
+      description: `Você recebeu ${challenge.rewardCoins} moedas e ${challenge.rewardItem?.name || 'um item'}.`,
+      duration: 5000,
+    });
   };
 
   return (

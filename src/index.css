@@ -156,6 +156,15 @@ All colors MUST be HSL.
     100% { transform: scale(1); opacity: 1; }
   }
   
+  @keyframes logo-pulse {
+    0%, 100% {
+      filter: drop-shadow(0 0 10px hsl(var(--primary) / 0.8)) drop-shadow(0 0 20px hsl(var(--secondary) / 0.4));
+    }
+    50% {
+      filter: drop-shadow(0 0 15px hsl(var(--primary) / 1)) drop-shadow(0 0 30px hsl(var(--secondary) / 0.6));
+    }
+  }
+
   .glow-primary {
     box-shadow: var(--shadow-glow-primary);
   }
@@ -178,6 +187,10 @@ All colors MUST be HSL.
   
   .animate-streak {
     animation: streak-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  .animate-logo-pulse {
+    animation: logo-pulse 3s ease-in-out infinite;
   }
   
   .shimmer {
@@ -205,4 +218,3 @@ All colors MUST be HSL.
     background-clip: text;
   }
 }
-
