@@ -28,6 +28,21 @@ export function useCoopMode() {
   const [myUserId, setMyUserId] = useState<string | null>(null);
   const { toast } = useToast();
 
+  // Função auxiliar para obter o ID do usuário (mockado para testes)
+  const getOrCreateUserId = useCallback(() => {
+    let userId = localStorage.getItem('jb_coop_user_id');
+    if (!userId) {
+      userId = crypto.randomUUID();
+      localStorage.setItem('jb_coop_user_id', userId);
+    }
+    setMyUserId(userId);
+    return userId;
+  }, []);
+
+  useEffect(() => {
+    getOrCreateUserId();
+  }, [getOrCreateUserId]);
+
   useEffect(() => {
     if (!session) return;
 
@@ -47,6 +62,14 @@ export function useCoopMode() {
           });
           
           setPlayers(activePlayers);
+          
+          // Atualiza o hostId se o host original sair e um novo for necessário (lógica simplificada)
+          if (activePlayers.length > 0 && !activePlayers.some(p => p.userId === session.hostId)) {
+            // Se o host original saiu, o primeiro jogador ativo se torna o novo host
+            const newHostId = activePlayers[0].userId;
+            setSession(prev => prev ? { ...prev, hostId: newHostId } : null);
+            setIsHost(newHostId === myUserId);
+          }
         }
       )
       .on(
@@ -93,12 +116,20 @@ export function useCoopMode() {
           });
         }
       )
+      .on(
+        'broadcast',
+        { event: 'game-start' },
+        () => {
+          setSession(prev => prev ? { ...prev, status: 'playing' } : null);
+          // O Index.tsx deve capturar a mudança de estado para iniciar o quiz
+        }
+      )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [session, toast]);
+  }, [session, myUserId, toast]);
 
   const createSession = useCallback(async (
     hostPlayer: Player,
@@ -106,17 +137,16 @@ export function useCoopMode() {
     maxPlayers: number,
     chapterId?: string
   ) => {
-    const userId = crypto.randomUUID();
-    const sessionId = crypto.randomUUID();
-    setMyUserId(userId);
+    const userId = getOrCreateUserId();
+    const sessionId = crypto.randomUUID().substring(0, 8).toUpperCase(); // ID mais curto e amigável
     
     const newSession: CoopSession = {
       id: sessionId,
-      hostId: userId, // Host is now identified by their userId
+      hostId: userId,
       teamName,
       maxPlayers,
       currentPlayers: [hostPlayer],
-      sharedLives: 6, // Shared lives for team
+      sharedLives: 6,
       sharedPowerUps: {},
       currentChapter: chapterId,
       status: 'waiting',
@@ -138,14 +168,29 @@ export function useCoopMode() {
     });
 
     return sessionId;
-  }, []);
+  }, [getOrCreateUserId]);
 
   const joinSession = useCallback(async (
     sessionId: string,
     player: Player
   ) => {
-    const userId = crypto.randomUUID();
-    setMyUserId(userId);
+    const userId = getOrCreateUserId();
+    
+    // Mock session data for the joining player (in a real app, this would be fetched)
+    const mockSession: CoopSession = {
+      id: sessionId,
+      hostId: '', // Será preenchido pelo presence sync
+      teamName: 'Time Bíblico',
+      maxPlayers: 4,
+      currentPlayers: [],
+      sharedLives: 6,
+      sharedPowerUps: {},
+      status: 'waiting',
+      createdAt: new Date().toISOString(),
+    };
+    setSession(mockSession);
+    setIsHost(false);
+
     const channel = supabase.channel(`coop-session-${sessionId}`);
     
     await channel.subscribe(async (status) => {
@@ -157,22 +202,7 @@ export function useCoopMode() {
         } as CoopPlayer);
       }
     });
-
-    // Mock session for now - in production, fetch from database
-    setSession({
-      id: sessionId,
-      hostId: '', // Will be updated by presence sync if host is present
-      teamName: 'Team',
-      maxPlayers: 4,
-      currentPlayers: [],
-      sharedLives: 6,
-      sharedPowerUps: {},
-      status: 'waiting',
-      createdAt: new Date().toISOString(),
-    });
-
-    setIsHost(false);
-  }, []);
+  }, [getOrCreateUserId]);
 
   const toggleReady = useCallback(async () => {
     if (!session || !myUserId) return;
@@ -262,6 +292,7 @@ export function useCoopMode() {
     setPlayers([]);
     setIsHost(false);
     setMyUserId(null);
+    localStorage.removeItem('jb_coop_user_id'); // Limpa o ID para que um novo seja gerado
   }, [session]);
 
   const currentPlayer = useMemo(() => {
@@ -273,7 +304,7 @@ export function useCoopMode() {
     players,
     isHost,
     currentPlayer,
-    myUserId, // Exportando myUserId
+    myUserId,
     createSession,
     joinSession,
     toggleReady,

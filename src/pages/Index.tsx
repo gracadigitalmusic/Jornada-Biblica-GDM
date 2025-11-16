@@ -31,12 +31,13 @@ import { useCoopMode } from "@/hooks/useCoopMode";
 import { StatsModal } from "@/components/quiz/StatsModal";
 import { DailyChallengeCard } from "@/components/quiz/DailyChallengeCard";
 import { ProfileModal } from "@/components/quiz/ProfileModal";
-import { CoopGameScreen } from "@/components/quiz/CoopGameScreen"; // Importando o novo componente
+import { CoopGameScreen } from "@/components/quiz/CoopGameScreen";
+import { CoopEntryScreen } from "@/components/quiz/CoopEntryScreen"; // Importando a nova tela
 import { GAME_CONSTANTS } from "@/data/questions";
 
 const Index = () => {
   const [gameMode, setGameMode] = useState<GameMode>("menu");
-  const [setupMode, setSetupMode] = useState<'solo' | 'multiplayer' | 'coop'>('solo'); // Adicionado 'coop'
+  const [setupMode, setSetupMode] = useState<'solo' | 'multiplayer' | 'coop'>('solo');
   const [showPlayerSetup, setShowPlayerSetup] = useState(false);
   const [showRanking, setShowRanking] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
@@ -208,22 +209,22 @@ const Index = () => {
     setShowProfile(true);
   };
 
+  const handleStartCoopEntry = () => {
+    setGameMode('coop_entry'); // Novo estado para a tela de entrada
+  };
+  
+  const handleEnterCoopLobby = () => {
+    setGameMode('coop_lobby');
+    setSetupMode('coop');
+    setShowCoopLobby(true);
+  };
+
   const handleSelectChapter = (chapterId: string) => {
     storyMode.setCurrentChapter(chapterId);
     // Mock player for host
     const lastUser = localStorage.getItem('jb_last_user');
     const hostPlayer = lastUser ? JSON.parse(lastUser) : { name: 'Peregrino', location: 'Story Mode', score: 0, avatar: '👑' };
     coop.createSession(hostPlayer, `Jornada ${chapterId}`, 4, chapterId);
-    setSetupMode('coop');
-    setShowCoopLobby(true);
-  };
-
-  const handleStartCoop = () => {
-    storyMode.setCurrentChapter(null);
-    // Mock player for host
-    const lastUser = localStorage.getItem('jb_last_user');
-    const hostPlayer = lastUser ? JSON.parse(lastUser) : { name: 'Peregrino', location: 'Co-op Livre', score: 0, avatar: '👑' };
-    coop.createSession(hostPlayer, 'Time Bíblico', 4);
     setSetupMode('coop');
     setShowCoopLobby(true);
   };
@@ -399,7 +400,7 @@ const Index = () => {
             onStartStudy={handleStartStudy}
             onStartTournament={handleStartTournament}
             onStartStory={handleStartStory}
-            onStartCoop={handleStartCoop}
+            onStartCoop={handleStartCoopEntry} // Alterado para a nova tela de entrada
             onShowRanking={() => {
               ranking.loadRanking();
               setShowRanking(true);
@@ -412,6 +413,13 @@ const Index = () => {
             isReviewAvailable={reviewHistory.hasIncorrectQuestions()}
             isNarrationEnabled={settings.isNarrationEnabled}
             onToggleNarration={toggleNarration}
+          />
+        )}
+        
+        {gameMode === "coop_entry" && (
+          <CoopEntryScreen
+            onBack={() => setGameMode('menu')}
+            onEnterLobby={handleEnterCoopLobby}
           />
         )}
         
@@ -527,7 +535,8 @@ const Index = () => {
         onClose={() => setShowStats(false)}
       />
       
-      {showCoopLobby && (
+      {/* Coop Lobby agora é um estado de jogo */}
+      {gameMode === 'coop_lobby' && coop.session && (
         <CoopLobby
           onStartGame={handleCoopGameStart}
           onCancel={handleCancelCoop}
