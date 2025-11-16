@@ -36,28 +36,33 @@ interface ModeButtonProps {
   colorClass: string;
 }
 
-const ModeButton = ({ icon, title, subtitle, onClick, delay, colorClass }: ModeButtonProps) => (
-  <motion.div 
-    initial={{ opacity: 0, y: 10 }} 
-    animate={{ opacity: 1, y: 0 }} 
-    transition={{ delay: delay, duration: 0.3 }} 
-    whileHover={{ scale: 1.02, boxShadow: '0 8px 15px rgba(0, 0, 0, 0.2)' }}
-    className="h-full"
-  >
-    <button 
-      onClick={onClick} 
-      className={`w-full h-full bg-quiz-card hover:bg-quiz-card-hover border-2 ${colorClass} rounded-xl p-4 text-left transition-all flex items-center gap-4`}
+const ModeButton = ({ icon, title, subtitle, onClick, delay, colorClass }: ModeButtonProps) => {
+  // Extrai o nome da cor (ex: 'primary' de 'border-primary')
+  const colorName = colorClass.replace('border-', '').split('/')[0];
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      transition={{ delay: delay, duration: 0.3 }} 
+      whileHover={{ scale: 1.02, boxShadow: '0 8px 15px rgba(0, 0, 0, 0.2)' }}
+      className="h-full"
     >
-      <div className="p-3 rounded-full flex-shrink-0" style={{ backgroundColor: `hsl(var(--${colorClass.split('/')[1].replace('border-', '')})/10)` }}>
-        {icon}
-      </div>
-      <div>
-        <h4 className="text-lg font-bold">{title}</h4>
-        <p className="text-sm text-muted-foreground">{subtitle}</p>
-      </div>
-    </button>
-  </motion.div>
-);
+      <button 
+        onClick={onClick} 
+        className={`w-full h-full bg-quiz-card hover:bg-quiz-card-hover border-2 ${colorClass} rounded-xl p-4 text-left transition-all flex items-center gap-4`}
+      >
+        <div className="p-3 rounded-full flex-shrink-0" style={{ backgroundColor: `hsl(var(--${colorName})/10)` }}>
+          {icon}
+        </div>
+        <div>
+          <h4 className="text-lg font-bold">{title}</h4>
+          <p className="text-sm text-muted-foreground">{subtitle}</p>
+        </div>
+      </button>
+    </motion.div>
+  );
+};
 
 export function MenuScreen({ 
   onStartSolo, 
