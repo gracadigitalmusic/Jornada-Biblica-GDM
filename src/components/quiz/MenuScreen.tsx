@@ -107,12 +107,12 @@ export function MenuScreen({
           <img 
             src="/logo_jogo.png" 
             alt="Jornada Bíblica Logo" 
-            className="w-28 h-28 md:w-32 md:h-32 object-contain animate-logo-pulse" // Reduzindo o tamanho da logo
+            className="w-24 h-24 md:w-28 md:h-28 object-contain animate-logo-pulse" // Reduzindo o tamanho da logo
           />
-          <h1 className="text-4xl md:text-5xl font-black mt-2 tracking-tight" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+          <h1 className="text-3xl md:text-4xl font-black mt-2 tracking-tight" style={{ fontFamily: "'Orbitron', sans-serif" }}>
             <span className="text-gradient-primary">JORNADA</span><br /><span className="text-gradient-secondary">BÍBLICA</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground font-medium">Teste seu conhecimento das Escrituras</p>
+          <p className="text-base md:text-lg text-muted-foreground font-medium">Teste seu conhecimento das Escrituras</p>
         </motion.div>
       </div>
 
