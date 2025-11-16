@@ -378,7 +378,7 @@ const Index = () => {
         // For simplicity, we assume the item ID is sufficient for the shop to recognize it.
         virtualShop.purchaseItem(reward.item.id); 
       }
-      celebration.celebration.celebrateAchievement();
+      celebration.celebrateAchievement();
     }
   };
 
