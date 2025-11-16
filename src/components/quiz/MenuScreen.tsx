@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Trophy, Users, User, Zap, Award, BookOpen, Flame, GraduationCap, Medal, BookMarked, Volume2, VolumeX, TrendingUp, ShoppingBag, LayoutGrid } from "lucide-react";
+import { Trophy, Users, User, Zap, Award, BookOpen, Flame, GraduationCap, Medal, BookMarked, Volume2, VolumeX, TrendingUp, ShoppingBag, LayoutGrid, Network, Infinity, Globe, Database, Target, Share2 } from "lucide-react";
 import { PlayerLevelCard } from "./PlayerLevelCard";
 import { BadgesDisplay } from "./BadgesDisplay";
 import { OfflineMode } from "./OfflineMode";
@@ -127,7 +127,7 @@ export function MenuScreen({
           </CardTitle>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <ModeButton
-              icon={<User className="w-6 h-6 text-primary" />}
+              icon={<Zap className="w-6 h-6 text-primary" />}
               title="Solo Rápido"
               subtitle="10 perguntas, ranking local"
               onClick={onStartSolo}
@@ -135,7 +135,7 @@ export function MenuScreen({
               colorClass="border-primary"
             />
             <ModeButton
-              icon={<Flame className="w-6 h-6 text-destructive" />}
+              icon={<Infinity className="w-6 h-6 text-destructive" />}
               title="Maratona"
               subtitle="Infinito, até perder 3 vidas"
               onClick={onStartMarathon}
@@ -143,7 +143,7 @@ export function MenuScreen({
               colorClass="border-destructive"
             />
             <ModeButton
-              icon={<Medal className="w-6 h-6 text-primary" />}
+              icon={<Trophy className="w-6 h-6 text-primary" />}
               title="Torneio Semanal"
               subtitle="Competição global de 10 perguntas"
               onClick={onStartTournament}
@@ -151,7 +151,7 @@ export function MenuScreen({
               colorClass="border-primary"
             />
             <ModeButton
-              icon={<Users className="w-6 h-6 text-secondary" />}
+              icon={<Network className="w-6 h-6 text-secondary" />}
               title="Multiplayer Local"
               subtitle="Batalha de 2 a 5 jogadores"
               onClick={onStartMultiplayer}
@@ -169,7 +169,7 @@ export function MenuScreen({
           </CardTitle>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <ModeButton
-              icon={<BookMarked className="w-6 h-6 text-primary" />}
+              icon={<Globe className="w-6 h-6 text-primary" />}
               title="Modo História"
               subtitle="Jornada narrativa imersiva"
               onClick={onStartStory}
@@ -177,7 +177,7 @@ export function MenuScreen({
               colorClass="border-primary"
             />
             <ModeButton
-              icon={<BookOpen className="w-6 h-6 text-success" />}
+              icon={<Database className="w-6 h-6 text-success" />}
               title="Modo Estudo"
               subtitle="Sem pressão, por categoria"
               onClick={onStartStudy}
@@ -186,7 +186,7 @@ export function MenuScreen({
             />
             {isReviewAvailable && (
               <ModeButton
-                icon={<GraduationCap className="w-6 h-6 text-secondary" />}
+                icon={<Target className="w-6 h-6 text-secondary" />}
                 title="Revisar Erros"
                 subtitle="Estude as perguntas que errou"
                 onClick={onShowReview}
@@ -195,7 +195,7 @@ export function MenuScreen({
               />
             )}
             <ModeButton
-              icon={<Users className="w-6 h-6 text-primary" />}
+              icon={<Share2 className="w-6 h-6 text-primary" />}
               title="Co-op Online"
               subtitle="Jogue em equipe (Beta)"
               onClick={onStartCoop}
