@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { MenuScreen } from "@/components/quiz/MenuScreen";
 import { PlayerSetup } from "@/components/quiz/PlayerSetup";
 import { QuizScreen } from "@/components/quiz/QuizScreen";
@@ -30,7 +30,7 @@ import { CoopLobby } from "@/components/quiz/CoopLobby";
 import { useCoopMode } from "@/hooks/useCoopMode";
 import { StatsModal } from "@/components/quiz/StatsModal";
 import { DailyChallengeCard } from "@/components/quiz/DailyChallengeCard";
-import { GAME_CONSTANTS } from "@/data/questions";
+import { FALLBACK_QUESTIONS, GAME_CONSTANTS } from "@/data/questions";
 
 const Index = () => {
   const [gameMode, setGameMode] = useState<GameMode>("menu");
@@ -73,6 +73,92 @@ const Index = () => {
     };
   }, [cancel]);
 
+  const handleEndGame = useCallback(() => {
+    setGameMode("menu");
+    setShowResults(false);
+    setIsGameOverState(false);
+  }, [setGameMode, setShowResults, setIsGameOverState]);
+
+  const handleQuitQuiz = () => {
+    if (confirm("Tem certeza que deseja sair? Seu progresso será perdido.")) {
+      cancel();
+      handleEndGame();
+    }
+  };
+
+  const handleGameEnd = useCallback(() => {
+    const isGameOver = setupMode === 'solo' && quiz.lives <= 0;
+    setIsGameOverState(isGameOver);
+    
+    // Log session for achievements
+    if (!isGameOver) {
+      achievements.logSession(
+        quiz.sessionWrongAnswers,
+        quiz.sessionHintUsed,
+        quiz.lives,
+        GAME_CONSTANTS.LIVES_PER_SESSION,
+        () => celebration.celebrateAchievement()
+      );
+
+      // Calculate total time spent in session (approximation)
+      const totalTimeSpent = quiz.totalQuestions * GAME_CONSTANTS.TIME_PER_QUESTION - quiz.timeRemaining;
+      
+      // Log session for stats
+      stats.logSession(
+        quiz.currentPlayer?.score || 0,
+        quiz.totalQuestions - quiz.sessionWrongAnswers,
+        quiz.sessionWrongAnswers,
+        totalTimeSpent
+      );
+
+      // Save to ranking if solo
+      if (setupMode === 'solo' && quiz.currentPlayer && quiz.currentPlayer.score > 0) {
+        ranking.addScore(quiz.currentPlayer);
+        
+        const leveledUp = playerLevel.addScore(quiz.currentPlayer.score);
+        if (leveledUp) {
+          setTimeout(() => celebration.playLevelUp(), 500);
+        }
+      }
+      
+      // Check for story chapter completion
+      if (storyMode.currentChapter) {
+        const perfect = quiz.sessionWrongAnswers === 0;
+        const noDeath = quiz.lives === GAME_CONSTANTS.LIVES_PER_SESSION;
+        storyMode.completeChapter(storyMode.currentChapter);
+        achievements.logStoryChapter(
+          storyMode.currentChapter,
+          perfect,
+          noDeath,
+          () => celebration.celebrateAchievement()
+        );
+      }
+      
+      if (quiz.sessionWrongAnswers === 0) {
+        setTimeout(() => celebration.celebrateVictory(), 1000);
+      }
+    }
+
+    setGameMode("results");
+  }, [
+    setupMode, 
+    quiz.lives, 
+    quiz.sessionWrongAnswers, 
+    quiz.sessionHintUsed, 
+    quiz.totalQuestions, 
+    quiz.timeRemaining, 
+    quiz.currentPlayer, 
+    storyMode.currentChapter,
+    setIsGameOverState,
+    achievements,
+    celebration,
+    stats,
+    ranking,
+    playerLevel,
+    storyMode,
+    setGameMode
+  ]);
+
   const handleStartSolo = () => {
     setSetupMode('solo');
     setShowPlayerSetup(true);
@@ -92,7 +178,8 @@ const Index = () => {
   };
 
   const handleStartTournament = () => {
-    setGameMode('tournament');
+    setSetupMode('solo');
+    setShowPlayerSetup(true);
   };
   
   const handleStartReview = () => {
@@ -114,7 +201,8 @@ const Index = () => {
   const handleSelectChapter = (chapterId: string) => {
     storyMode.setCurrentChapter(chapterId);
     // Mock player for host
-    const hostPlayer = { name: 'Host', location: 'Story Mode', score: 0, avatar: '👑' };
+    const lastUser = localStorage.getItem('jb_last_user');
+    const hostPlayer = lastUser ? JSON.parse(lastUser) : { name: 'Peregrino', location: 'Story Mode', score: 0, avatar: '👑' };
     coop.createSession(hostPlayer, `Jornada ${chapterId}`, 4, chapterId);
     setShowCoopLobby(true);
   };
@@ -122,7 +210,8 @@ const Index = () => {
   const handleStartCoop = () => {
     storyMode.setCurrentChapter(null);
     // Mock player for host
-    const hostPlayer = { name: 'Host', location: 'Co-op Livre', score: 0, avatar: '👑' };
+    const lastUser = localStorage.getItem('jb_last_user');
+    const hostPlayer = lastUser ? JSON.parse(lastUser) : { name: 'Peregrino', location: 'Co-op Livre', score: 0, avatar: '👑' };
     coop.createSession(hostPlayer, 'Time Bíblico', 4);
     setShowCoopLobby(true);
   };
@@ -242,80 +331,11 @@ const Index = () => {
     handleAnswer(-1);
   };
 
-  const handleGameEnd = () => {
-    const isGameOver = setupMode === 'solo' && quiz.lives <= 0;
-    setIsGameOverState(isGameOver);
-    
-    // Log session for achievements
-    if (!isGameOver) {
-      achievements.logSession(
-        quiz.sessionWrongAnswers,
-        quiz.sessionHintUsed,
-        quiz.lives,
-        3,
-        () => celebration.celebrateAchievement()
-      );
-
-      // Calculate total time spent in session (approximation)
-      const totalTimeSpent = quiz.totalQuestions * GAME_CONSTANTS.TIME_PER_QUESTION - quiz.timeRemaining;
-      
-      // Log session for stats
-      stats.logSession(
-        quiz.currentPlayer?.score || 0,
-        quiz.totalQuestions - quiz.sessionWrongAnswers,
-        quiz.sessionWrongAnswers,
-        totalTimeSpent
-      );
-
-      // Save to ranking if solo
-      if (setupMode === 'solo' && quiz.currentPlayer && quiz.currentPlayer.score > 0) {
-        ranking.addScore(quiz.currentPlayer);
-        
-        const leveledUp = playerLevel.addScore(quiz.currentPlayer.score);
-        if (leveledUp) {
-          setTimeout(() => celebration.playLevelUp(), 500);
-        }
-      }
-      
-      // Check for story chapter completion
-      if (storyMode.currentChapter) {
-        const perfect = quiz.sessionWrongAnswers === 0;
-        const noDeath = quiz.lives === 3;
-        storyMode.completeChapter(storyMode.currentChapter);
-        achievements.logStoryChapter(
-          storyMode.currentChapter,
-          perfect,
-          noDeath,
-          () => celebration.celebrateAchievement()
-        );
-      }
-      
-      if (quiz.sessionWrongAnswers === 0) {
-        setTimeout(() => celebration.celebrateVictory(), 1000);
-      }
-    }
-
-    setGameMode("results");
-  };
-
   const handleContinue = () => {
     setShowPlayerSetup(true);
     setGameMode("menu");
   };
 
-  const handleEndGame = () => {
-    setGameMode("menu");
-    setShowResults(false);
-    setIsGameOverState(false);
-  };
-
-  const handleQuitQuiz = () => {
-    if (confirm("Tem certeza que deseja sair? Seu progresso será perdido.")) {
-      cancel();
-      handleEndGame();
-    }
-  };
-  
   const handleClaimDailyReward = () => {
     const reward = dailyChallenge.claimReward();
     if (reward.coins > 0) {

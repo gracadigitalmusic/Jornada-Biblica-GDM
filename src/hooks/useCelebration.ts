@@ -1,7 +1,11 @@
 import confetti from 'canvas-confetti';
+import { useGameSounds } from './useGameSounds';
 
 export function useCelebration() {
+  const { playLevelUp } = useGameSounds();
+  
   const celebrateLevelUp = () => {
+    playLevelUp(); // Toca o som
     const duration = 3000;
     const animationEnd = Date.now() + duration;
     const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
@@ -107,5 +111,6 @@ export function useCelebration() {
     celebrateAchievement,
     celebratePowerUp,
     celebrateVictory,
+    playLevelUp, // Expondo a função de som para uso direto no Index.tsx
   };
 }
