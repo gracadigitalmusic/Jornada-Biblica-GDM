@@ -83,12 +83,12 @@ export function MarathonMode({ onStart, onBack }: MarathonModeProps) {
 
             <div>
               <label className="block text-sm font-bold mb-2">Escolha seu Avatar</label>
-              <div className="grid grid-cols-7 gap-2"> {/* Alterado para 7 colunas */}
+              <div className="grid grid-cols-7 gap-2">
                 {avatars.map((avatar) => (
                   <button
                     key={avatar}
                     onClick={() => setSelectedAvatar(avatar)}
-                    className={`text-3xl p-2 rounded-lg transition-all ${
+                    className={`text-3xl p-2 rounded-lg transition-all flex items-center justify-center ${ // Adicionado flex items-center justify-center
                       selectedAvatar === avatar
                         ? 'bg-primary/20 ring-2 ring-primary scale-110'
                         : 'bg-background hover:bg-muted border border-border'

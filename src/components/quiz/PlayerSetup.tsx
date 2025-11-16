@@ -134,7 +134,7 @@ export function PlayerSetup({ open, onClose, onStart, mode }: PlayerSetupProps) 
                   )}
                 </div>
 
-                <div className="grid grid-cols-7 gap-2 justify-center"> {/* Alterado para 7 colunas */}
+                <div className="grid grid-cols-7 gap-2 justify-center">
                   {avatars.map((avatar) => {
                     const isSelected = player.avatar === avatar;
                     const isTaken = usedAvatars.includes(avatar) && !isSelected;
