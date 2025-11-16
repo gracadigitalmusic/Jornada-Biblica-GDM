@@ -1,0 +1,20 @@
+{
+  "name": "Jornada Bíblica - Quiz Interativo",
+  "short_name": "Jornada Bíblica",
+  "description": "Teste seus conhecimentos bíblicos em um quiz interativo e competitivo",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0f2c",
+  "theme_color": "#0a0f2c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["education", "games"],
+  "lang": "pt-BR",
+  "dir": "ltr"
+}
