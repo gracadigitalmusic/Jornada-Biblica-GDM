@@ -32,13 +32,6 @@ function selectRandomQuestion(): Question {
 export function useDailyChallenge() {
   const [challenge, setChallenge] = useLocalStorage<DailyChallenge | null>('jb_daily_challenge', null);
 
-  useEffect(() => {
-    const today = getTodayDate();
-    if (!challenge || challenge.date !== today) {
-      generateNewChallenge(today);
-    }
-  }, [challenge]);
-
   const generateNewChallenge = useCallback((date: string) => {
     const reward = CHALLENGE_REWARDS[Math.floor(Math.random() * CHALLENGE_REWARDS.length)];
     const question = selectRandomQuestion();
@@ -54,6 +47,13 @@ export function useDailyChallenge() {
     };
     setChallenge(newChallenge);
   }, [setChallenge]);
+
+  useEffect(() => {
+    const today = getTodayDate();
+    if (!challenge || challenge.date !== today) {
+      generateNewChallenge(today);
+    }
+  }, [challenge, generateNewChallenge]);
 
   const updateProgress = useCallback((scoreGained: number) => {
     if (!challenge || challenge.isCompleted) return;

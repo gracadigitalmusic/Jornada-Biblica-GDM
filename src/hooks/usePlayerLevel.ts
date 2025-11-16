@@ -14,15 +14,6 @@ export function usePlayerLevel() {
   const [totalScore, setTotalScore] = useState(0);
   const [currentLevel, setCurrentLevel] = useState<PlayerLevel>(LEVELS[0]);
 
-  useEffect(() => {
-    const stored = localStorage.getItem('jb_total_score');
-    if (stored) {
-      const score = parseInt(stored);
-      setTotalScore(score);
-      updateLevel(score);
-    }
-  }, []);
-
   const updateLevel = useCallback((score: number) => {
     for (let i = LEVELS.length - 1; i >= 0; i--) {
       if (score >= LEVELS[i].minScore) {
@@ -31,6 +22,15 @@ export function usePlayerLevel() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('jb_total_score');
+    if (stored) {
+      const score = parseInt(stored);
+      setTotalScore(score);
+      updateLevel(score);
+    }
+  }, [updateLevel]);
 
   const addScore = useCallback((points: number) => {
     const newScore = totalScore + points;
