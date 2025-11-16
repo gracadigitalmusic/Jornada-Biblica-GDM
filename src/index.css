@@ -66,7 +66,7 @@ All colors MUST be HSL.
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
@@ -122,8 +122,14 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-gradient-to-br from-[hsl(var(--quiz-bg-start))] to-[hsl(var(--quiz-bg-end))] text-foreground;
+    /* Removendo o gradiente de fundo e min-h-screen para melhor incorporação */
+    @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Adicionando o estilo de fundo ao container principal do app para manter o visual */
+  #root > div {
+    @apply bg-gradient-to-br from-[hsl(var(--quiz-bg-start))] to-[hsl(var(--quiz-bg-end))] min-h-screen;
   }
 }
 

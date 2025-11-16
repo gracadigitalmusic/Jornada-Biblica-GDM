@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Question, Player } from '@/types/quiz';
 import { FALLBACK_QUESTIONS, GAME_CONSTANTS } from '@/data/questions';
+import { useCustomQuestions } from './useCustomQuestions'; // Importando o novo hook
 
 function shuffle<T>(array: T[]): T[] {
   const arr = [...array];
@@ -12,6 +13,7 @@ function shuffle<T>(array: T[]): T[] {
 }
 
 export function useQuizGame() {
+  const { customQuestions, fetchCustomQuestions } = useCustomQuestions();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [players, setPlayers] = useState<Player[]>([]);
@@ -24,6 +26,11 @@ export function useQuizGame() {
   const [sessionWrongAnswers, setSessionWrongAnswers] = useState(0);
   const [sessionHintUsed, setSessionHintUsed] = useState(false);
   const [hintUsedOnQuestion, setHintUsedOnQuestion] = useState(false);
+
+  // 1. Carregar perguntas personalizadas ao iniciar
+  useEffect(() => {
+    fetchCustomQuestions();
+  }, [fetchCustomQuestions]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -44,7 +51,10 @@ export function useQuizGame() {
   }, [isTimerRunning, timeRemaining]);
 
   const initializeGame = useCallback((playersList: Player[], numQuestions: number) => {
-    const availableQuestions = FALLBACK_QUESTIONS.filter(q => !q.isKids);
+    // Combina perguntas padrão e personalizadas
+    const allAvailableQuestions = [...FALLBACK_QUESTIONS, ...customQuestions];
+    
+    const availableQuestions = allAvailableQuestions.filter(q => !q.isKids);
     const shuffled = shuffle(availableQuestions);
     const selected = shuffled.slice(0, Math.min(numQuestions, shuffled.length));
     
@@ -61,7 +71,7 @@ export function useQuizGame() {
     setHintUsedOnQuestion(false);
     setIsTimerRunning(true);
     return selected[0]?.question; // Retorna o texto da primeira pergunta
-  }, []);
+  }, [customQuestions]); // Depende de customQuestions
 
   const useHint = useCallback(() => {
     if (hints <= 0) return null;
@@ -160,6 +170,7 @@ export function useQuizGame() {
 
   return {
     questions,
+    customQuestions, // Expondo as perguntas customizadas
     currentQuestionIndex,
     currentQuestion: questions[currentQuestionIndex],
     players,
