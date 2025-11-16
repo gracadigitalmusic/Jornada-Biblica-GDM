@@ -30,12 +30,13 @@ import { CoopLobby } from "@/components/quiz/CoopLobby";
 import { useCoopMode } from "@/hooks/useCoopMode";
 import { StatsModal } from "@/components/quiz/StatsModal";
 import { DailyChallengeCard } from "@/components/quiz/DailyChallengeCard";
-import { ProfileModal } from "@/components/quiz/ProfileModal"; // Importando o novo modal
+import { ProfileModal } from "@/components/quiz/ProfileModal";
+import { CoopGameScreen } from "@/components/quiz/CoopGameScreen"; // Importando o novo componente
 import { GAME_CONSTANTS } from "@/data/questions";
 
 const Index = () => {
   const [gameMode, setGameMode] = useState<GameMode>("menu");
-  const [setupMode, setSetupMode] = useState<'solo' | 'multiplayer'>('solo');
+  const [setupMode, setSetupMode] = useState<'solo' | 'multiplayer' | 'coop'>('solo'); // Adicionado 'coop'
   const [showPlayerSetup, setShowPlayerSetup] = useState(false);
   const [showRanking, setShowRanking] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
@@ -45,7 +46,7 @@ const Index = () => {
   const [showNextButton, setShowNextButton] = useState(false);
   const [showCoopLobby, setShowCoopLobby] = useState(false);
   const [showStats, setShowStats] = useState(false);
-  const [showProfile, setShowProfile] = useState(false); // Novo estado
+  const [showProfile, setShowProfile] = useState(false);
 
   const quiz = useQuizGame();
   const achievements = useAchievements();
@@ -61,12 +62,12 @@ const Index = () => {
   const stats = useStats();
   const dailyChallenge = useDailyChallenge();
 
-  // Check for timeout
+  // Check for timeout (only for solo/multiplayer local)
   useEffect(() => {
-    if (gameMode === "quiz" && quiz.timeRemaining <= 0 && !showResults) {
+    if (gameMode === "quiz" && setupMode !== 'coop' && quiz.timeRemaining <= 0 && !showResults) {
       handleTimeout();
     }
-  }, [quiz.timeRemaining, gameMode, showResults]);
+  }, [quiz.timeRemaining, gameMode, showResults, setupMode]);
 
   // Stop narration when leaving quiz
   useEffect(() => {
@@ -79,7 +80,10 @@ const Index = () => {
     setGameMode("menu");
     setShowResults(false);
     setIsGameOverState(false);
-  }, [setGameMode, setShowResults, setIsGameOverState]);
+    if (setupMode === 'coop') {
+      coop.leaveSession();
+    }
+  }, [setGameMode, setShowResults, setIsGameOverState, setupMode, coop]);
 
   const handleQuitQuiz = () => {
     if (confirm("Tem certeza que deseja sair? Seu progresso será perdido.")) {
@@ -210,6 +214,7 @@ const Index = () => {
     const lastUser = localStorage.getItem('jb_last_user');
     const hostPlayer = lastUser ? JSON.parse(lastUser) : { name: 'Peregrino', location: 'Story Mode', score: 0, avatar: '👑' };
     coop.createSession(hostPlayer, `Jornada ${chapterId}`, 4, chapterId);
+    setSetupMode('coop');
     setShowCoopLobby(true);
   };
 
@@ -219,6 +224,7 @@ const Index = () => {
     const lastUser = localStorage.getItem('jb_last_user');
     const hostPlayer = lastUser ? JSON.parse(lastUser) : { name: 'Peregrino', location: 'Co-op Livre', score: 0, avatar: '👑' };
     coop.createSession(hostPlayer, 'Time Bíblico', 4);
+    setSetupMode('coop');
     setShowCoopLobby(true);
   };
 
@@ -226,10 +232,16 @@ const Index = () => {
     setShowCoopLobby(false);
     setGameMode('quiz');
     
-    const playersList = coop.players.map(p => ({ name: p.name, location: p.location, score: 0, avatar: p.avatar }));
+    // Use players from coop hook, but map them to the quiz game structure
+    const playersList: Player[] = coop.players.map(p => ({ 
+      name: p.name, 
+      location: coop.session?.teamName || 'Co-op', 
+      score: 0, 
+      avatar: p.avatar 
+    }));
+    
     const numQuestions = 10; 
     const firstQuestionText = quiz.initializeGame(playersList, numQuestions);
-    setSetupMode('multiplayer'); 
     
     if (settings.isNarrationEnabled && firstQuestionText) {
       setTimeout(() => speak(firstQuestionText), 500);
@@ -240,6 +252,7 @@ const Index = () => {
     coop.leaveSession();
     setShowCoopLobby(false);
     setGameMode('menu');
+    setSetupMode('solo');
   };
 
   const handleMarathonReady = (player: Player) => {
@@ -273,6 +286,8 @@ const Index = () => {
 
   const handleAnswer = (selectedIndex: number) => {
     cancel();
+    
+    // Use quiz.answerQuestion logic for score calculation
     const result = selectedIndex === -1 
       ? quiz.handleTimeout() 
       : quiz.answerQuestion(selectedIndex);
@@ -299,6 +314,11 @@ const Index = () => {
     
     if (!result.correct && quiz.currentQuestion) {
       reviewHistory.addIncorrectQuestion(quiz.currentQuestion.id);
+      
+      // In Coop mode, if wrong, reduce shared lives
+      if (setupMode === 'coop' && coop.session) {
+        coop.updateLives(coop.session.sharedLives - 1);
+      }
     }
     
     achievements.logAnswer(
@@ -309,8 +329,14 @@ const Index = () => {
       () => celebration.celebrateAchievement()
     );
 
-    setShowResults(true);
-    setShowNextButton(true);
+    // Only show next button/results if not in coop mode (coop handles state via broadcast)
+    if (setupMode !== 'coop') {
+      setShowResults(true);
+      setShowNextButton(true);
+    } else {
+      // In coop, the answer is processed, but the screen waits for the host to advance
+      // The CoopGameScreen handles the visual feedback based on the local answer/broadcast
+    }
 
     if (settings.isNarrationEnabled && quiz.currentQuestion?.explanation) {
       const answerText = `A resposta correta é: ${quiz.currentQuestion.options[quiz.currentQuestion.answer]}. ${quiz.currentQuestion.explanation}`;
@@ -322,7 +348,7 @@ const Index = () => {
     cancel();
     setShowNextButton(false);
     
-    if (quiz.isGameOver()) {
+    if (quiz.isGameOver() || (setupMode === 'coop' && (coop.session?.sharedLives || 0) <= 0)) {
       handleGameEnd();
     } else {
       const nextQuestionText = quiz.nextQuestion();
@@ -382,7 +408,7 @@ const Index = () => {
             onShowPowerUpShop={() => setShowPowerUpShop(true)}
             onShowReview={handleStartReview}
             onShowStats={handleShowStats}
-            onShowProfile={handleShowProfile} // Passando o novo handler
+            onShowProfile={handleShowProfile}
             isReviewAvailable={reviewHistory.hasIncorrectQuestions()}
             isNarrationEnabled={settings.isNarrationEnabled}
             onToggleNarration={toggleNarration}
@@ -420,7 +446,7 @@ const Index = () => {
           <ReviewMode onBack={() => setGameMode("menu")} />
         )}
 
-        {gameMode === "quiz" && quiz.currentQuestion && (
+        {gameMode === "quiz" && quiz.currentQuestion && setupMode !== 'coop' && (
           <QuizScreen
             question={quiz.currentQuestion}
             questionIndex={quiz.currentQuestionIndex}
@@ -441,11 +467,26 @@ const Index = () => {
             onNarrate={speak}
           />
         )}
+        
+        {gameMode === "quiz" && quiz.currentQuestion && setupMode === 'coop' && coop.session && (
+          <CoopGameScreen
+            question={quiz.currentQuestion}
+            questionIndex={quiz.currentQuestionIndex}
+            totalQuestions={quiz.totalQuestions}
+            players={quiz.players}
+            currentPlayerIndex={quiz.currentPlayerIndex}
+            onAnswer={handleAnswer}
+            onNextQuestion={handleNextQuestion}
+            onQuit={handleQuitQuiz}
+            isNarrationEnabled={settings.isNarrationEnabled}
+            onNarrate={speak}
+          />
+        )}
 
         {gameMode === "results" && (
           <ResultsScreen
             players={quiz.players}
-            gameMode={setupMode}
+            gameMode={setupMode === 'coop' ? 'multiplayer' : setupMode}
             isGameOver={isGameOverState}
             onContinue={handleContinue}
             onEndGame={handleEndGame}
@@ -458,7 +499,7 @@ const Index = () => {
         open={showPlayerSetup}
         onClose={() => setShowPlayerSetup(false)}
         onStart={handlePlayersReady}
-        mode={setupMode}
+        mode={setupMode === 'coop' ? 'multiplayer' : setupMode}
       />
 
       <RankingModal

@@ -29,7 +29,7 @@ export function ConnectionStatus() {
 
   return (
     <TooltipProvider>
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-2"> {/* Adicionado 'flex items-center gap-2' aqui */}
         {/* Status da Conexão */}
         <Tooltip>
           <TooltipTrigger asChild>

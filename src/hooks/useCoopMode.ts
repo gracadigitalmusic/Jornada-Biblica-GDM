@@ -272,7 +272,8 @@ export function useCoopMode() {
     session,
     players,
     isHost,
-    currentPlayer, // Exportando o jogador atual
+    currentPlayer,
+    myUserId, // Exportando myUserId
     createSession,
     joinSession,
     toggleReady,
