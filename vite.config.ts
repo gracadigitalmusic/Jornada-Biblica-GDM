@@ -17,9 +17,7 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, 'quiz.html'),
-      },
+      // Removido: input: { main: path.resolve(__dirname, 'quiz.html') }
     },
     // Copia o service worker para o build
     copyPublicDir: true,
