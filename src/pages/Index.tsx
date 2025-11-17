@@ -19,7 +19,7 @@ import { useOfflineMode } from "@/hooks/useOfflineMode";
 import { Player, GameMode } from "@/types/quiz";
 import { GAME_CONSTANTS } from "@/data/questions";
 import { Loader2 } from "lucide-react";
-import { throttle } from "lodash-es"; // Importando throttle
+import { throttle } from "lodash-es";
 
 // Dynamic Imports for Code Splitting
 const LazyGameScreens = lazy(() => import("@/components/quiz/GameScreens").then(mod => ({ default: mod.GameScreens })));
@@ -50,9 +50,8 @@ const Index = () => {
   const coop = useCoopMode();
   const stats = useStats();
   const dailyChallenge = useDailyChallenge();
-  const offlineMode = useOfflineMode(); // Novo hook
+  const offlineMode = useOfflineMode();
 
-  // Throttle/Debounce implementation (Exemplo: para resize, embora não seja crítico aqui)
   useEffect(() => {
     const handleResize = throttle(() => {
       // Lógica de redimensionamento otimizada
@@ -62,14 +61,12 @@ const Index = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Check for timeout (only for solo/multiplayer local)
   useEffect(() => {
     if (gameMode === "quiz" && setupMode !== 'coop' && quiz.timeRemaining <= 0 && !showResults) {
       handleTimeout();
     }
   }, [quiz.timeRemaining, gameMode, showResults, setupMode]);
 
-  // Stop narration when leaving quiz
   useEffect(() => {
     return () => {
       cancel();
@@ -96,7 +93,6 @@ const Index = () => {
     const isGameOver = setupMode === 'solo' && quiz.lives <= 0;
     setIsGameOverState(isGameOver);
     
-    // Log session for achievements
     if (!isGameOver) {
       achievements.logSession(
         quiz.sessionWrongAnswers,
@@ -106,10 +102,8 @@ const Index = () => {
         () => celebration.celebrateAchievement()
       );
 
-      // Calculate total time spent in session (approximation)
       const totalTimeSpent = quiz.totalQuestions * GAME_CONSTANTS.TIME_PER_QUESTION - quiz.timeRemaining;
       
-      // Log session for stats
       stats.logSession(
         quiz.currentPlayer?.score || 0,
         quiz.totalQuestions - quiz.sessionWrongAnswers,
@@ -117,7 +111,6 @@ const Index = () => {
         totalTimeSpent
       );
 
-      // Save to ranking if solo
       if (setupMode === 'solo' && quiz.currentPlayer && quiz.currentPlayer.score > 0) {
         ranking.addScore(quiz.currentPlayer);
         
@@ -127,7 +120,6 @@ const Index = () => {
         }
       }
       
-      // Check for story chapter completion
       if (storyMode.currentChapter) {
         const perfect = quiz.sessionWrongAnswers === 0;
         const noDeath = quiz.lives === GAME_CONSTANTS.LIVES_PER_SESSION;
@@ -165,7 +157,6 @@ const Index = () => {
     setGameMode
   ]);
 
-  // --- Handlers for Menu/Setup ---
   const handleStartSolo = () => {
     setSetupMode('solo');
     setShowPlayerSetup(true);
@@ -211,7 +202,6 @@ const Index = () => {
 
   const handleSelectChapter = (chapterId: string) => {
     storyMode.setCurrentChapter(chapterId);
-    // Mock player for host
     const lastUser = localStorage.getItem('jb_last_user');
     const hostPlayer = lastUser ? JSON.parse(lastUser) : { name: 'Peregrino', location: 'Story Mode', score: 0, avatar: '👑' };
     coop.createSession(hostPlayer, `Jornada ${chapterId}`, 4, chapterId);
@@ -220,7 +210,6 @@ const Index = () => {
   };
 
   const handleCoopGameStart = async () => {
-    // Use players from coop hook, but map them to the quiz game structure
     const playersList: Player[] = coop.players.map(p => ({ 
       name: p.name, 
       location: coop.session?.teamName || 'Co-op', 
@@ -260,7 +249,6 @@ const Index = () => {
   const handleAnswer = (selectedIndex: number) => {
     cancel();
     
-    // Use quiz.answerQuestion logic for score calculation
     const result = selectedIndex === -1 
       ? quiz.handleTimeout() 
       : quiz.answerQuestion(selectedIndex);
@@ -268,27 +256,22 @@ const Index = () => {
     const gainedPoints = result.pointsEarned;
     const didLevelUp = playerLevel.addScore(gainedPoints);
     
-    // Log answer for stats
     if (quiz.currentQuestion) {
       const timeSpent = GAME_CONSTANTS.TIME_PER_QUESTION - result.timeRemaining;
       stats.logAnswer(quiz.currentQuestion, result.correct, timeSpent);
     }
     
-    // Update daily challenge progress
     dailyChallenge.updateProgress(gainedPoints);
     
-    // Add coins for correct answers
     if (result.correct) {
       virtualShop.addCoins(gainedPoints);
     }
     
-    // Check for story chapter unlocks
     storyMode.checkUnlocks(playerLevel.totalScore);
     
     if (!result.correct && quiz.currentQuestion) {
       reviewHistory.addIncorrectQuestion(quiz.currentQuestion.id);
       
-      // In Coop mode, if wrong, reduce shared lives
       if (setupMode === 'coop' && coop.session) {
         coop.updateLives(coop.session.sharedLives - 1);
       }
@@ -302,7 +285,6 @@ const Index = () => {
       () => celebration.celebrateAchievement()
     );
 
-    // Only show next button/results if not in coop mode (coop handles state via broadcast)
     if (setupMode !== 'coop') {
       setShowResults(true);
       setShowNextButton(true);

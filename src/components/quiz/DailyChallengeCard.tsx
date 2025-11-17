@@ -21,7 +21,6 @@ export function DailyChallengeCard({ onStartChallenge, onClaimReward }: DailyCha
   const progressPercent = (challenge.currentProgress / challenge.targetScore) * 100;
 
   const handleClaimReward = () => {
-    // A lógica de adicionar moedas e itens está agora no Index.tsx
     onClaimReward();
     
     toast({
@@ -38,7 +37,7 @@ export function DailyChallengeCard({ onStartChallenge, onClaimReward }: DailyCha
       transition={{ delay: 0.8 }}
       className="w-full"
     >
-      <Card className={`p-4 border-2 ${challenge.isCompleted ? 'border-success glow-success' : 'border-secondary/30'}`}>
+      <Card className={`p-4 border-2 ${challenge.isCompleted ? 'border-success animate-pulse-glow-primary' : 'border-secondary/30 shimmer'}`}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-secondary" />

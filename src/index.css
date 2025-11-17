@@ -71,6 +71,13 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Novas variáveis para o tema high-tech/cristão */
+    --celestial-blue: 210 80% 60%;
+    --celestial-purple: 270 70% 50%;
+    --celestial-gold: 45 93% 47%;
+    --orb-gradient: radial-gradient(circle at center, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.5) 30%, transparent 70%);
+    --orb-gradient-dark: radial-gradient(circle at center, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.3) 30%, transparent 70%);
   }
 
   .dark {
@@ -179,11 +186,35 @@ All colors MUST be HSL.
   
   @keyframes logo-pulse {
     0%, 100% {
-      filter: drop-shadow(0 0 10px hsl(var(--primary) / 0.8)) drop-shadow(0 0 20px hsl(var(--secondary) / 0.4));
+      filter: drop-shadow(0 0 10px hsl(var(--primary) / 0.8)) drop_shadow(0 0 20px hsl(var(--secondary) / 0.4));
     }
     50% {
-      filter: drop-shadow(0 0 15px hsl(var(--primary) / 1)) drop-shadow(0 0 30px hsl(var(--secondary) / 0.6));
+      filter: drop-shadow(0 0 15px hsl(var(--primary) / 1)) drop_shadow(0 0 30px hsl(var(--secondary) / 0.6));
     }
+  }
+
+  /* Novas animações e utilitários */
+  .animate-pulse-glow-primary {
+    animation: pulse-glow-primary 2s ease-in-out infinite;
+  }
+  .animate-pulse-glow-secondary {
+    animation: pulse-glow-secondary 1.5s ease-in-out infinite alternate;
+  }
+  .animate-orb-pulse {
+    animation: orb-pulse 3s ease-in-out infinite;
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+  .animate-shimmer-effect {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--primary) / 0.1) 50%,
+      transparent 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer-effect 3s infinite linear;
   }
 
   .glow-primary {
@@ -246,5 +277,13 @@ All colors MUST be HSL.
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  /* Estilo para o orbe central */
+  .orb-background {
+    background: var(--orb-gradient);
+  }
+  .dark .orb-background {
+    background: var(--orb-gradient-dark);
   }
 }

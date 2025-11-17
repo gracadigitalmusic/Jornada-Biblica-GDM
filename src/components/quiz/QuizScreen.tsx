@@ -62,7 +62,7 @@ export function QuizScreen({
 
   const currentPlayer = players[currentPlayerIndex];
   const timePercent = (timeRemaining / GAME_CONSTANTS.TIME_PER_QUESTION) * 100;
-  const comboGlowClass = combo >= 3 ? 'animate-combo-glow glow-secondary' : '';
+  const comboGlowClass = combo >= 3 ? 'animate-pulse-glow-secondary' : '';
 
   useEffect(() => {
     // Reset state when question changes
@@ -159,6 +159,7 @@ export function QuizScreen({
       toast({
         title: "Copiado!",
         description: "Resultado copiado para a área de transferência",
+        duration: 2000,
       });
     } catch (error) {
       console.error('Erro ao copiar:', error);
@@ -166,6 +167,7 @@ export function QuizScreen({
         title: "Erro",
         description: "Não foi possível copiar o texto",
         variant: "destructive",
+        duration: 2000,
       });
     }
   };

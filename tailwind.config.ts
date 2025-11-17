@@ -54,6 +54,8 @@ export default {
         quiz: {
           card: "hsl(var(--quiz-card))",
           "card-hover": "hsl(var(--quiz-card-hover))",
+          "bg-start": "hsl(var(--quiz-bg-start))", // Adicionado
+          "bg-end": "hsl(var(--quiz-bg-end))",     // Adicionado
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
@@ -64,6 +66,14 @@ export default {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
+        },
+        // Novas cores para o tema high-tech/cristão
+        celestial: {
+          DEFAULT: "hsl(240 50% 8%)", // Cor de fundo escura
+          light: "hsl(220 40% 10%)",
+          blue: "hsl(210 80% 60%)",
+          purple: "hsl(270 70% 50%)",
+          gold: "hsl(45 93% 47%)",
         },
       },
       borderRadius: {
@@ -88,10 +98,36 @@ export default {
             height: "0",
           },
         },
+        // Novas keyframes para animações high-tech
+        "pulse-glow-primary": {
+          "0%, 100%": { boxShadow: "0 0 20px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--primary) / 0.2)" },
+          "50%": { boxShadow: "0 0 30px hsl(var(--primary) / 0.6), 0 0 60px hsl(var(--primary) / 0.3)" },
+        },
+        "pulse-glow-secondary": {
+          "0%, 100%": { boxShadow: "0 0 15px hsl(var(--secondary) / 0.5)" },
+          "50%": { boxShadow: "0 0 25px hsl(var(--secondary) / 0.8)" },
+        },
+        "orb-pulse": {
+          "0%, 100%": { transform: "scale(1)", opacity: "0.8" },
+          "50%": { transform: "scale(1.05)", opacity: "1" },
+        },
+        "fade-in-up": {
+          "0%": { opacity: "0", transform: "translateY(20px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "shimmer-effect": {
+          "0%": { backgroundPosition: "-1000px 0" },
+          "100%": { backgroundPosition: "1000px 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "pulse-glow-primary": "pulse-glow-primary 2s ease-in-out infinite",
+        "pulse-glow-secondary": "pulse-glow-secondary 1.5s ease-in-out infinite alternate",
+        "orb-pulse": "orb-pulse 3s ease-in-out infinite",
+        "fade-in-up": "fade-in-up 0.5s ease-out forwards",
+        "shimmer-effect": "shimmer-effect 3s infinite linear",
       },
     },
   },

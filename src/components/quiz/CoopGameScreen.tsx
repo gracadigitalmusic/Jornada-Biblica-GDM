@@ -54,7 +54,7 @@ export function CoopGameScreen({
   const currentPlayer = players[currentPlayerIndex];
   const isMyTurn = coop.currentPlayer?.name === currentPlayer.name;
   const timePercent = (timeRemaining / GAME_CONSTANTS.TIME_PER_QUESTION) * 100;
-  const comboGlowClass = coop.session?.sharedLives && coop.session.sharedLives > 3 ? 'animate-combo-glow glow-secondary' : '';
+  const comboGlowClass = coop.session?.sharedLives && coop.session.sharedLives > 3 ? 'animate-pulse-glow-secondary' : '';
 
 
   // --- Timer Logic ---
@@ -134,6 +134,7 @@ export function CoopGameScreen({
           toast({
             title: "Novo jogador!",
             description: `${newPlayer.name} entrou no time.`,
+            duration: 2000,
           });
         }
       )
@@ -146,6 +147,7 @@ export function CoopGameScreen({
             title: "Jogador saiu",
             description: `${leftPlayer.name} deixou o time.`,
             variant: "destructive",
+            duration: 2000,
           });
         }
       )
@@ -167,6 +169,7 @@ export function CoopGameScreen({
           toast({
             title: "Power-up usado!",
             description: `${payload.playerName} usou ${payload.powerUpName}`,
+            duration: 2000,
           });
         }
       )
