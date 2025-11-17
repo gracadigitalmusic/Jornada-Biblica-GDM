@@ -46,13 +46,13 @@ export function CoopLobby({ onStartGame, onCancel }: CoopLobbyProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-6 flex items-center justify-center">
+    <div className="p-6 flex items-center justify-center w-full h-full min-h-screen">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-6xl"
       >
-        <Card className="border-primary/20">
+        <Card className="border-primary/20 max-h-[90vh] overflow-y-auto">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -196,8 +196,8 @@ export function CoopLobby({ onStartGame, onCancel }: CoopLobbyProps) {
               </div>
             </div>
 
-            {/* Coluna 3: Chat */}
-            <div className="lg:col-span-1 h-[500px]">
+            {/* Coluna 3: Chat - Ajustado para ser responsivo */}
+            <div className="lg:col-span-1 h-full min-h-[400px]">
               {currentPlayer && (
                 <CoopChat session={coop.session} currentPlayer={currentPlayer} />
               )}
