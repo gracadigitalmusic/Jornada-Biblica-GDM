@@ -383,7 +383,7 @@ const Index = () => {
   };
 
   return (
-    <div className="flex items-center justify-center p-4 relative overflow-hidden min-h-screen overflow-y-auto">
+    <div className="p-4 relative overflow-hidden min-h-screen overflow-y-auto">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-float" />
@@ -391,7 +391,7 @@ const Index = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
       </div>
 
-      <div className="w-full max-w-6xl relative z-10">
+      <div className="w-full max-w-6xl mx-auto relative z-10">
         {gameMode === "menu" && (
           <MenuScreen
             onStartSolo={handleStartSolo}
