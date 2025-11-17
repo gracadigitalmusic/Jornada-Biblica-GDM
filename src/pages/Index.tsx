@@ -124,7 +124,7 @@ const Index = () => {
         
         const leveledUp = playerLevel.addScore(quiz.currentPlayer.score);
         if (leveledUp) {
-          setTimeout(() => celebration.playLevelUp(), 500);
+          setTimeout(() => celebration.celebrateLevelUp(), 500); // Usando a função completa
         }
       }
       
