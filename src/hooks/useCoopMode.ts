@@ -301,8 +301,10 @@ export function useCoopMode() {
 
   return {
     session,
-    players,
+    setSession, // Exportado para corrigir erros 2, 4, 5, 6
     isHost,
+    setIsHost, // Exportado para corrigir erro 3
+    players,
     currentPlayer,
     myUserId,
     createSession,

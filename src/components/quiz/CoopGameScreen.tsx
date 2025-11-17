@@ -183,7 +183,7 @@ export function CoopGameScreen({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [coop.session, coop.myUserId, onNextQuestion, onQuit, toast]);
+  }, [coop.session, coop.myUserId, onNextQuestion, onQuit, toast, coop.setSession, coop.setIsHost]);
 
   // --- Local Handlers ---
 
