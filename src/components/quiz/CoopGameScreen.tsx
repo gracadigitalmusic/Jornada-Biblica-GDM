@@ -54,7 +54,7 @@ export function CoopGameScreen({
   const currentPlayer = players[currentPlayerIndex];
   const isMyTurn = coop.currentPlayer?.name === currentPlayer.name;
   const timePercent = (timeRemaining / GAME_CONSTANTS.TIME_PER_QUESTION) * 100;
-  const comboGlowClass = coop.session?.sharedLives && coop.session.sharedLives > 3 ? 'animate-pulse-glow-secondary' : '';
+  // Removido comboGlowClass, pois combos são geralmente individuais e não baseados em vidas compartilhadas.
 
 
   // --- Timer Logic ---
@@ -175,6 +175,37 @@ export function CoopGameScreen({
       )
       .on(
         'broadcast',
+        { event: 'answer-selected' }, // Listener para respostas
+        ({ payload }) => {
+          // Apenas atualiza o feedback visual para os outros jogadores
+          if (payload.userId !== coop.myUserId) {
+            handleAnswerReceived(payload.index, payload.isCorrect);
+          }
+        }
+      )
+      .on(
+        'broadcast',
+        { event: 'hint-used' }, // Listener para dicas
+        ({ payload }) => {
+          if (payload.userId !== coop.myUserId) {
+            setDisabledIndices(payload.disabledIndices);
+            toast({
+              title: "Dica usada!",
+              description: `${payload.playerName} usou uma dica.`,
+              duration: 2000,
+            });
+          }
+        }
+      )
+      .on(
+        'broadcast',
+        { event: 'next-question' }, // Listener para avançar pergunta
+        () => {
+          onNextQuestion();
+        }
+      )
+      .on(
+        'broadcast',
         { event: 'game-start' },
         () => {
           coop.setSession(prev => prev ? { ...prev, status: 'playing' } : null);
@@ -227,6 +258,7 @@ export function CoopGameScreen({
         userId: coop.myUserId,
         index,
         isCorrect,
+        playerName: coop.currentPlayer?.name, // Adicionado para a notificação de dica
       },
     });
     
@@ -274,7 +306,8 @@ export function CoopGameScreen({
       type: 'broadcast',
       event: 'hint-used',
       payload: {
-        playerName: currentPlayer.name,
+        userId: coop.myUserId, // Adicionado userId
+        playerName: coop.currentPlayer?.name,
         disabledIndices: indicesToDisable,
       },
     });
@@ -384,7 +417,6 @@ export function CoopGameScreen({
               : 'border-destructive animate-[shake_0.5s_ease] glow-destructive'
             : 'border-border'
           }
-          ${!showFeedback && comboGlowClass}
         `}
       >
         <h2 className="text-xl md:text-2xl font-bold mb-6 text-foreground">

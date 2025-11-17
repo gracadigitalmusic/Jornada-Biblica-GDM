@@ -324,7 +324,7 @@ const Index = () => {
   };
 
   return (
-    <div className="p-4 relative overflow-hidden min-h-screen overflow-y-auto">
+    <div className="relative overflow-hidden min-h-screen overflow-y-auto"> {/* Removido p-4 aqui */}
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-float" />
@@ -377,7 +377,7 @@ const Index = () => {
           handleQuitQuiz={handleQuitQuiz}
           handleContinue={handleContinue}
           onSetGameMode={setGameMode}
-          handleEndGame={handleGameEnd}
+          handleEndGame={handleEndGame}
         />
       </Suspense>
 
