@@ -32,7 +32,7 @@ import { StatsModal } from "@/components/quiz/StatsModal";
 import { DailyChallengeCard } from "@/components/quiz/DailyChallengeCard";
 import { ProfileModal } from "@/components/quiz/ProfileModal";
 import { CoopGameScreen } from "@/components/quiz/CoopGameScreen";
-import { CoopEntryScreen } from "@/components/quiz/CoopEntryScreen"; // Importando a nova tela
+import { CoopEntryScreen } from "@/components/quiz/CoopEntryScreen";
 import { GAME_CONSTANTS } from "@/data/questions";
 
 const Index = () => {
@@ -383,7 +383,7 @@ const Index = () => {
   };
 
   return (
-    <div className="flex items-center justify-center p-4 relative overflow-hidden min-h-screen">
+    <div className="flex items-center justify-center p-4 relative overflow-hidden min-h-screen overflow-y-auto">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-float" />

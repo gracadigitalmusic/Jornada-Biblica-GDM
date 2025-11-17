@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Trophy, Users, User, Zap, Award, Volume2, VolumeX, TrendingUp, ShoppingBag, Network, Infinity, Globe, Database, Target, Share2, Crown, BookOpen, BookMarked } from "lucide-react";
+import { Trophy, Users, User, Zap, Award, Volume2, VolumeX, TrendingUp, ShoppingBag, Network, Infinity, Globe, Database, Target, Share2, Crown, BookOpen, BookMarked, Settings, LucideProps } from "lucide-react";
 import { Card, CardTitle } from "@/components/ui/card";
+import { ForwardRefExoticComponent, RefAttributes } from "react";
 
 interface MenuScreenProps {
   onStartSolo: () => void;
@@ -22,8 +23,19 @@ interface MenuScreenProps {
   onToggleNarration: () => void;
 }
 
+interface GameModeDefinition {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
+  onClick: (props: MenuScreenProps) => void;
+  color: string;
+  glow: string;
+  condition?: (props: MenuScreenProps) => boolean; // Adicionado 'condition' opcional
+}
+
 // Definição dos modos de jogo com ícones e cores de destaque
-const GAME_MODES = [
+const GAME_MODES: GameModeDefinition[] = [
   { 
     id: 'solo', 
     title: "Solo Rápido", 
@@ -58,7 +70,7 @@ const GAME_MODES = [
     icon: Network, 
     onClick: (props: MenuScreenProps) => props.onStartMultiplayer(), 
     color: 'accent',
-    glow: 'glow-secondary' // Usando glow secundário para accent
+    glow: 'glow-secondary'
   },
   { 
     id: 'story', 
@@ -69,6 +81,19 @@ const GAME_MODES = [
     color: 'primary',
     glow: 'glow-primary'
   },
+  { 
+    id: 'coop', 
+    title: "Co-op Online", 
+    subtitle: "Jogue em equipe (Beta)", 
+    icon: Share2, 
+    onClick: (props: MenuScreenProps) => props.onStartCoop(), 
+    color: 'primary',
+    glow: 'glow-primary'
+  },
+];
+
+// Modos de Aprendizado
+const LEARNING_MODES: GameModeDefinition[] = [
   { 
     id: 'study', 
     title: "Modo Estudo", 
@@ -88,27 +113,19 @@ const GAME_MODES = [
     glow: 'glow-secondary',
     condition: (props: MenuScreenProps) => props.isReviewAvailable
   },
-  { 
-    id: 'coop', 
-    title: "Co-op Online", 
-    subtitle: "Jogue em equipe (Beta)", 
-    icon: Share2, 
-    onClick: (props: MenuScreenProps) => props.onStartCoop(), 
-    color: 'primary',
-    glow: 'glow-primary'
-  },
 ];
 
 // Componente auxiliar para botões de modo de jogo
 interface ModeButtonProps {
-  mode: typeof GAME_MODES[0];
+  mode: GameModeDefinition; // Usando a nova interface
   props: MenuScreenProps;
   delay: number;
 }
 
 const ModeButton = ({ mode, props, delay }: ModeButtonProps) => {
   const Icon = mode.icon;
-  const isAvailable = mode.condition ? mode.condition(props) : true;
+  // A verificação agora funciona corretamente
+  const isAvailable = mode.condition ? mode.condition(props) : true; 
   const colorClass = `border-${mode.color}/50`;
   const iconColorClass = `text-${mode.color}`;
   const glowClass = mode.glow === 'glow-destructive' ? 'shadow-destructive/50' : mode.glow === 'glow-secondary' ? 'shadow-secondary/50' : 'shadow-primary/50';
@@ -139,21 +156,24 @@ const ModeButton = ({ mode, props, delay }: ModeButtonProps) => {
 };
 
 export function MenuScreen(props: MenuScreenProps) {
-  const competitiveModes = GAME_MODES.slice(0, 4);
-  const learningModes = GAME_MODES.slice(4);
+  const allModes = [...GAME_MODES, ...LEARNING_MODES];
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="text-center space-y-8 relative max-w-4xl mx-auto"
+      className="text-center space-y-8 relative max-w-4xl mx-auto pt-12 pb-12"
     >
       {/* Top Bar & Logo */}
-      <div className="flex flex-col items-center justify-center mb-8">
+      <div className="flex flex-col items-center justify-center mb-10">
+        {/* Botões de Configuração (Movidos para o topo) */}
         <div className="absolute top-0 right-0 flex items-center gap-2">
+          <Button onClick={props.onShowProfile} variant="ghost" size="icon" className="text-primary hover:bg-primary/10">
+            <User className="w-5 h-5" />
+          </Button>
           <Button variant="ghost" size="icon" onClick={props.onToggleNarration}>
-            {props.isNarrationEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5 text-muted-foreground" />}
+            {props.isNarrationEnabled ? <Volume2 className="w-5 h-5 text-secondary" /> : <VolumeX className="w-5 h-5 text-muted-foreground" />}
           </Button>
         </div>
 
@@ -166,57 +186,37 @@ export function MenuScreen(props: MenuScreenProps) {
           <img 
             src="/logo_jogo.png" 
             alt="Jornada Bíblica Logo" 
-            className="w-24 h-24 md:w-28 md:h-28 object-contain animate-logo-pulse"
+            className="w-28 h-28 md:w-36 md:h-36 object-contain animate-logo-pulse"
           />
-          <h1 className="text-3xl md:text-4xl font-black mt-2 tracking-tight" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+          <h1 className="text-4xl md:text-5xl font-black mt-4 tracking-tight" style={{ fontFamily: "'Orbitron', sans-serif" }}>
             <span className="text-gradient-primary">JORNADA</span><br /><span className="text-gradient-secondary">BÍBLICA</span>
           </h1>
-          <p className="text-base md:text-lg text-muted-foreground font-medium">Teste seu conhecimento das Escrituras</p>
+          <p className="text-base md:text-lg text-muted-foreground font-medium mt-2">Teste seu conhecimento das Escrituras</p>
         </motion.div>
       </div>
 
-      {/* Main Content Grid - Modos de Jogo */}
-      <div className="grid grid-cols-1 gap-6">
-        
-        {/* Modos Competitivos */}
-        <Card className="p-6 bg-quiz-card/50 backdrop-blur border-secondary/20">
-          <CardTitle className="text-xl font-bold mb-4 flex items-center gap-2 text-gradient-secondary">
-            <Trophy className="w-6 h-6" />
-            Modos Competitivos
-          </CardTitle>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {competitiveModes.map((mode, index) => (
-              <ModeButton key={mode.id} mode={mode} props={props} delay={0.4 + index * 0.1} />
-            ))}
-          </div>
-        </Card>
+      {/* Main Content Grid - Modos de Jogo (Todos juntos em uma grade maior) */}
+      <Card className="p-6 bg-quiz-card/50 backdrop-blur border-primary/20">
+        <CardTitle className="text-xl font-bold mb-6 flex items-center justify-center gap-2 text-gradient-primary">
+          <BookMarked className="w-6 h-6" />
+          Escolha sua Jornada
+        </CardTitle>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {allModes.map((mode, index) => (
+            <ModeButton key={mode.id} mode={mode} props={props} delay={0.4 + index * 0.05} />
+          ))}
+        </div>
+      </Card>
 
-        {/* Modos de Aprendizado e Narrativa */}
-        <Card className="p-6 bg-quiz-card/50 backdrop-blur border-success/20">
-          <CardTitle className="text-xl font-bold mb-4 flex items-center gap-2 text-gradient-success">
-            <BookMarked className="w-6 h-6" />
-            Aprendizado & História
-          </CardTitle>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {learningModes.map((mode, index) => (
-              <ModeButton key={mode.id} mode={mode} props={props} delay={0.8 + index * 0.1} />
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      {/* Rodapé de Ferramentas */}
+      {/* Rodapé de Ferramentas (Mais compacto) */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }} 
         animate={{ opacity: 1, y: 0 }} 
         transition={{ delay: 1.2 }} 
         className="mt-8 pt-4 border-t border-border/50"
       >
-        <h3 className="text-lg font-bold mb-4 text-muted-foreground">Ferramentas e Perfil</h3>
+        <h3 className="text-lg font-bold mb-4 text-muted-foreground">Hall da Fama & Loja</h3>
         <div className="flex flex-wrap justify-center gap-4">
-          <Button onClick={props.onShowProfile} variant="outline" size="lg" className="gap-2">
-            <User className="w-4 h-4 text-primary" />Perfil & Status
-          </Button>
           <Button onClick={props.onShowRanking} variant="outline" size="lg" className="gap-2">
             <Trophy className="w-4 h-4 text-secondary" />Ranking
           </Button>
