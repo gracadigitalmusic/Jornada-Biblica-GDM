@@ -16,9 +16,11 @@ import { useVirtualShop } from "@/hooks/useVirtualShop";
 import { useStats } from "@/hooks/useStats";
 import { useDailyChallenge } from "@/hooks/useDailyChallenge";
 import { useCoopMode } from "@/hooks/useCoopMode";
+import { useOfflineMode } from "@/hooks/useOfflineMode";
 import { Player, GameMode } from "@/types/quiz";
 import { GAME_CONSTANTS } from "@/data/questions";
 import { Loader2 } from "lucide-react";
+import { throttle } from "lodash-es"; // Importando throttle
 
 // Dynamic Imports for Code Splitting
 const LazyGameScreens = lazy(() => import("@/components/quiz/GameScreens").then(mod => ({ default: mod.GameScreens })));
@@ -49,6 +51,17 @@ const Index = () => {
   const coop = useCoopMode();
   const stats = useStats();
   const dailyChallenge = useDailyChallenge();
+  const offlineMode = useOfflineMode(); // Novo hook
+
+  // Throttle/Debounce implementation (Exemplo: para resize, embora não seja crítico aqui)
+  useEffect(() => {
+    const handleResize = throttle(() => {
+      // Lógica de redimensionamento otimizada
+    }, 200);
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Check for timeout (only for solo/multiplayer local)
   useEffect(() => {
@@ -164,8 +177,8 @@ const Index = () => {
     setShowPlayerSetup(true);
   };
 
-  const handleStartMarathon = (player: Player) => {
-    const firstQuestionText = quiz.initializeGame([player], 999);
+  const handleStartMarathon = async (player: Player) => {
+    const firstQuestionText = await quiz.initializeGame([player], 999, offlineMode.loadOfflineQuestions);
     setGameMode("quiz");
     setSetupMode('solo');
     achievements.unlock('start');
@@ -207,7 +220,7 @@ const Index = () => {
     setGameMode('coop_lobby');
   };
 
-  const handleCoopGameStart = () => {
+  const handleCoopGameStart = async () => {
     // Use players from coop hook, but map them to the quiz game structure
     const playersList: Player[] = coop.players.map(p => ({ 
       name: p.name, 
@@ -217,7 +230,7 @@ const Index = () => {
     }));
     
     const numQuestions = 10; 
-    const firstQuestionText = quiz.initializeGame(playersList, numQuestions);
+    const firstQuestionText = await quiz.initializeGame(playersList, numQuestions, offlineMode.loadOfflineQuestions);
     setGameMode('quiz');
     
     if (settings.isNarrationEnabled && firstQuestionText) {
@@ -231,10 +244,10 @@ const Index = () => {
     setSetupMode('solo');
   };
 
-  const handlePlayersReady = (players: Player[]) => {
+  const handlePlayersReady = async (players: Player[]) => {
     setShowPlayerSetup(false);
     const numQuestions = setupMode === 'solo' ? 10 : 20 + (players.length - 2) * 5;
-    const firstQuestionText = quiz.initializeGame(players, numQuestions);
+    const firstQuestionText = await quiz.initializeGame(players, numQuestions, offlineMode.loadOfflineQuestions);
     setGameMode("quiz");
     achievements.unlock('start');
     setShowResults(false);

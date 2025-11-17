@@ -24,6 +24,7 @@ export function useQuizGame() {
   const [sessionWrongAnswers, setSessionWrongAnswers] = useState(0);
   const [sessionHintUsed, setSessionHintUsed] = useState(false);
   const [hintUsedOnQuestion, setHintUsedOnQuestion] = useState(false);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -43,8 +44,15 @@ export function useQuizGame() {
     return () => clearInterval(interval);
   }, [isTimerRunning, timeRemaining]);
 
-  const initializeGame = useCallback((playersList: Player[], numQuestions: number) => {
-    const availableQuestions = FALLBACK_QUESTIONS.filter(q => !q.isKids);
+  const initializeGame = useCallback(async (
+    playersList: Player[], 
+    numQuestions: number, 
+    loadQuestionsFn: () => Promise<Question[]> // Nova função para carregar perguntas
+  ) => {
+    setIsLoadingQuestions(true);
+    
+    const allAvailableQuestions = await loadQuestionsFn();
+    const availableQuestions = allAvailableQuestions.filter(q => !q.isKids);
     const shuffled = shuffle(availableQuestions);
     const selected = shuffled.slice(0, Math.min(numQuestions, shuffled.length));
     
@@ -60,6 +68,8 @@ export function useQuizGame() {
     setSessionHintUsed(false);
     setHintUsedOnQuestion(false);
     setIsTimerRunning(true);
+    setIsLoadingQuestions(false);
+    
     return selected[0]?.question; // Retorna o texto da primeira pergunta
   }, []);
 
@@ -173,6 +183,7 @@ export function useQuizGame() {
     sessionWrongAnswers,
     sessionHintUsed,
     hintUsedOnQuestion,
+    isLoadingQuestions,
     initializeGame,
     useHint,
     answerQuestion,

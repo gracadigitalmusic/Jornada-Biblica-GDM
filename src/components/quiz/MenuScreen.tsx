@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Trophy, Users, User, Zap, Award, Volume2, VolumeX, TrendingUp, ShoppingBag, Network, Infinity, Globe, Database, Target, Share2, Crown, BookOpen, BookMarked, Settings, LucideProps } from "lucide-react";
+import { Trophy, Users, User, Zap, Award, Volume2, VolumeX, TrendingUp, ShoppingBag, Network, Infinity, Globe, Database, Target, Share2, Crown, BookOpen, BookMarked, Settings, LucideProps, Download } from "lucide-react";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 import { DailyChallengeCard } from "./DailyChallengeCard"; // Importando o card
@@ -25,6 +25,9 @@ interface MenuScreenProps {
   // Novos props para o Desafio Diário
   onStartChallenge: () => void;
   onClaimReward: () => void;
+  // Novos props para Offline Mode
+  isOfflineDataCached: boolean;
+  onDownloadOffline: () => void;
 }
 
 interface GameModeDefinition {
@@ -199,6 +202,28 @@ export function MenuScreen(props: MenuScreenProps) {
         </motion.div>
       </div>
       
+      {/* Botão de Download Offline em Destaque */}
+      {!props.isOfflineDataCached && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="max-w-md mx-auto"
+        >
+          <Button
+            onClick={props.onDownloadOffline}
+            size="lg"
+            className="w-full h-16 text-lg bg-success hover:bg-success/90 gap-3 animate-combo-glow"
+          >
+            <Download className="w-6 h-6" />
+            Baixar Jogo 100% Offline
+          </Button>
+          <p className="text-xs text-muted-foreground mt-2">
+            Baixe todas as perguntas para jogar sem internet.
+          </p>
+        </motion.div>
+      )}
+
       {/* Main Content Grid - Modos de Jogo (Todos juntos em uma grade maior) */}
       <Card className="p-6 bg-quiz-card/50 backdrop-blur border-primary/20">
         <CardTitle className="text-xl font-bold mb-6 flex items-center justify-center gap-2 text-gradient-primary">
