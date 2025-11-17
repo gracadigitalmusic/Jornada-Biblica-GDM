@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { PlayerSetup } from "@/components/quiz/PlayerSetup";
-import { AICompanion } from "@/components/quiz/AICompanion";
 import { GameModals } from "@/components/quiz/GameModals";
 import { GameScreens } from "@/components/quiz/GameScreens";
 import { useQuizGame } from "@/hooks/useQuizGame";
@@ -421,9 +420,6 @@ const Index = () => {
         setShowProfile={setShowProfile}
         onStartSolo={handleStartSolo}
       />
-
-      {/* AI Companion - sempre disponível */}
-      <AICompanion />
     </div>
   );
 };
