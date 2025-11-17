@@ -18,6 +18,7 @@ import { useStoryMode } from "@/hooks/useStoryMode";
 import { usePlayerLevel } from "@/hooks/usePlayerLevel";
 import { useCoopMode } from "@/hooks/useCoopMode";
 import { useDailyChallenge } from "@/hooks/useDailyChallenge";
+import { useOfflineMode } from "@/hooks/useOfflineMode"; // Importando o hook
 
 interface GameScreensProps {
   gameMode: GameMode;
@@ -34,6 +35,7 @@ interface GameScreensProps {
   showNextButton: boolean;
   isGameOverState: boolean;
   dailyChallenge: ReturnType<typeof useDailyChallenge>;
+  offlineMode: ReturnType<typeof useOfflineMode>; // Adicionando offlineMode
 
   // Handlers
   onStartSolo: () => void;
@@ -76,6 +78,7 @@ export function GameScreens({
   showNextButton,
   isGameOverState,
   dailyChallenge,
+  offlineMode, // Desestruturado
   onStartSolo,
   onStartMultiplayer,
   onStartMarathon,
@@ -145,6 +148,8 @@ export function GameScreens({
           onToggleNarration={toggleNarration}
           onStartChallenge={onStartSolo} // Desafio Diário usa o modo Solo
           onClaimReward={handleClaimReward}
+          isOfflineDataCached={offlineMode.isDataCached} // Passando prop
+          onDownloadOffline={offlineMode.downloadForOffline} // Passando handler
         />
       )}
       

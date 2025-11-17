@@ -372,6 +372,7 @@ const Index = () => {
           showNextButton={showNextButton}
           isGameOverState={isGameOverState}
           dailyChallenge={dailyChallenge}
+          offlineMode={offlineMode}
           
           onStartSolo={handleStartSolo}
           onStartMultiplayer={handleStartMultiplayer}
