@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Trophy, Users, User, Zap, Award, Volume2, VolumeX, TrendingUp, ShoppingBag, Network, Infinity, Globe, Database, Target, Share2, Crown, BookOpen, BookMarked, Settings, LucideProps } from "lucide-react";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
+import { DailyChallengeCard } from "./DailyChallengeCard"; // Importando o card
 
 interface MenuScreenProps {
   onStartSolo: () => void;
   onStartMultiplayer: () => void;
-  onStartMarathon: () => void;
+  onStartMarathon: (player: any) => void; // Ajustado para aceitar player object
   onStartStudy: () => void;
   onStartTournament: () => void;
   onStartStory: () => void;
@@ -21,6 +22,9 @@ interface MenuScreenProps {
   isReviewAvailable: boolean;
   isNarrationEnabled: boolean;
   onToggleNarration: () => void;
+  // Novos props para o Desafio Diário
+  onStartChallenge: () => void;
+  onClaimReward: () => void;
 }
 
 interface GameModeDefinition {
@@ -50,7 +54,7 @@ const GAME_MODES: GameModeDefinition[] = [
     title: "Maratona", 
     subtitle: "Infinito, até perder 3 vidas", 
     icon: Infinity, 
-    onClick: (props: MenuScreenProps) => props.onStartMarathon(), 
+    onClick: (props: MenuScreenProps) => props.onStartMarathon({ name: 'Maratonista', location: 'Maratona', score: 0, avatar: '🏃' }), // Mock player for Marathon start
     color: 'destructive',
     glow: 'glow-destructive'
   },
@@ -194,6 +198,12 @@ export function MenuScreen(props: MenuScreenProps) {
           <p className="text-base md:text-lg text-muted-foreground font-medium mt-2">Teste seu conhecimento das Escrituras</p>
         </motion.div>
       </div>
+      
+      {/* Desafio Diário - Novo elemento na tela principal */}
+      <DailyChallengeCard 
+        onStartChallenge={props.onStartSolo} 
+        onClaimReward={props.onClaimReward} 
+      />
 
       {/* Main Content Grid - Modos de Jogo (Todos juntos em uma grade maior) */}
       <Card className="p-6 bg-quiz-card/50 backdrop-blur border-primary/20">

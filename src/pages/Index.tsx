@@ -1,15 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { MenuScreen } from "@/components/quiz/MenuScreen";
 import { PlayerSetup } from "@/components/quiz/PlayerSetup";
-import { QuizScreen } from "@/components/quiz/QuizScreen";
-import { ResultsScreen } from "@/components/quiz/ResultsScreen";
-import { RankingModal } from "@/components/quiz/RankingModal";
-import { AchievementsModal } from "@/components/quiz/AchievementsModal";
-import { PowerUpShop } from "@/components/quiz/PowerUpShop";
-import { MarathonMode } from "@/components/quiz/MarathonMode";
-import { StudyMode } from "@/components/quiz/StudyMode";
-import { TournamentMode } from "@/components/quiz/TournamentMode";
-import { ReviewMode } from "@/components/quiz/ReviewMode";
+import { AICompanion } from "@/components/quiz/AICompanion";
+import { GameModals } from "@/components/quiz/GameModals";
+import { GameScreens } from "@/components/quiz/GameScreens";
 import { useQuizGame } from "@/hooks/useQuizGame";
 import { useAchievements } from "@/hooks/useAchievements";
 import { useRanking } from "@/hooks/useRanking";
@@ -22,17 +15,8 @@ import { useStoryMode } from "@/hooks/useStoryMode";
 import { useVirtualShop } from "@/hooks/useVirtualShop";
 import { useStats } from "@/hooks/useStats";
 import { useDailyChallenge } from "@/hooks/useDailyChallenge";
-import { Player, GameMode } from "@/types/quiz";
-import { StoryModeScreen } from "@/components/quiz/StoryModeScreen";
-import { VirtualShop } from "@/components/quiz/VirtualShop";
-import { AICompanion } from "@/components/quiz/AICompanion";
-import { CoopLobby } from "@/components/quiz/CoopLobby";
 import { useCoopMode } from "@/hooks/useCoopMode";
-import { StatsModal } from "@/components/quiz/StatsModal";
-import { DailyChallengeCard } from "@/components/quiz/DailyChallengeCard";
-import { ProfileModal } from "@/components/quiz/ProfileModal";
-import { CoopGameScreen } from "@/components/quiz/CoopGameScreen";
-import { CoopEntryScreen } from "@/components/quiz/CoopEntryScreen";
+import { Player, GameMode } from "@/types/quiz";
 import { GAME_CONSTANTS } from "@/data/questions";
 
 const Index = () => {
@@ -45,7 +29,6 @@ const Index = () => {
   const [showResults, setShowResults] = useState(false);
   const [isGameOverState, setIsGameOverState] = useState(false);
   const [showNextButton, setShowNextButton] = useState(false);
-  const [showCoopLobby, setShowCoopLobby] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
 
@@ -124,7 +107,7 @@ const Index = () => {
         
         const leveledUp = playerLevel.addScore(quiz.currentPlayer.score);
         if (leveledUp) {
-          setTimeout(() => celebration.celebrateLevelUp(), 500); // Usando a função completa
+          setTimeout(() => celebration.celebrateLevelUp(), 500);
         }
       }
       
@@ -166,6 +149,7 @@ const Index = () => {
     setGameMode
   ]);
 
+  // --- Handlers for Menu/Setup ---
   const handleStartSolo = () => {
     setSetupMode('solo');
     setShowPlayerSetup(true);
@@ -176,47 +160,37 @@ const Index = () => {
     setShowPlayerSetup(true);
   };
 
-  const handleStartMarathon = () => {
-    setGameMode('marathon');
+  const handleStartMarathon = (player: Player) => {
+    const firstQuestionText = quiz.initializeGame([player], 999);
+    setGameMode("quiz");
+    setSetupMode('solo');
+    achievements.unlock('start');
+    if (settings.isNarrationEnabled && firstQuestionText) {
+      setTimeout(() => speak(firstQuestionText), 500);
+    }
   };
 
-  const handleStartStudy = () => {
-    setGameMode('study');
-  };
-
+  const handleStartStudy = () => setGameMode('study');
   const handleStartTournament = () => {
     setSetupMode('solo');
     setShowPlayerSetup(true);
   };
-  
-  const handleStartReview = () => {
-    setGameMode('review');
+  const handleStartReview = () => setGameMode('review');
+  const handleStartStory = () => setGameMode('story');
+  const handleShowRanking = () => {
+    ranking.loadRanking();
+    setShowRanking(true);
   };
+  const handleShowAchievements = () => setShowAchievements(true);
+  const handleShowPowerUpShop = () => setShowPowerUpShop(true);
+  const handleShowStats = () => setShowStats(true);
+  const handleShowProfile = () => setShowProfile(true);
 
-  const handleStartStory = () => {
-    setGameMode('story');
-  };
-
-  const handleShowShop = () => {
-    setShowPowerUpShop(true);
-  };
-  
-  const handleShowStats = () => {
-    setShowStats(true);
-  };
-
-  const handleShowProfile = () => {
-    setShowProfile(true);
-  };
-
-  const handleStartCoopEntry = () => {
-    setGameMode('coop_entry'); // Novo estado para a tela de entrada
-  };
+  const handleStartCoopEntry = () => setGameMode('coop_entry');
   
   const handleEnterCoopLobby = () => {
     setGameMode('coop_lobby');
     setSetupMode('coop');
-    setShowCoopLobby(true);
   };
 
   const handleSelectChapter = (chapterId: string) => {
@@ -226,13 +200,10 @@ const Index = () => {
     const hostPlayer = lastUser ? JSON.parse(lastUser) : { name: 'Peregrino', location: 'Story Mode', score: 0, avatar: '👑' };
     coop.createSession(hostPlayer, `Jornada ${chapterId}`, 4, chapterId);
     setSetupMode('coop');
-    setShowCoopLobby(true);
+    setGameMode('coop_lobby');
   };
 
   const handleCoopGameStart = () => {
-    setShowCoopLobby(false);
-    setGameMode('quiz');
-    
     // Use players from coop hook, but map them to the quiz game structure
     const playersList: Player[] = coop.players.map(p => ({ 
       name: p.name, 
@@ -243,6 +214,7 @@ const Index = () => {
     
     const numQuestions = 10; 
     const firstQuestionText = quiz.initializeGame(playersList, numQuestions);
+    setGameMode('quiz');
     
     if (settings.isNarrationEnabled && firstQuestionText) {
       setTimeout(() => speak(firstQuestionText), 500);
@@ -251,24 +223,8 @@ const Index = () => {
 
   const handleCancelCoop = () => {
     coop.leaveSession();
-    setShowCoopLobby(false);
     setGameMode('menu');
     setSetupMode('solo');
-  };
-
-  const handleMarathonReady = (player: Player) => {
-    const firstQuestionText = quiz.initializeGame([player], 999);
-    setGameMode("quiz");
-    setSetupMode('solo');
-    achievements.unlock('start');
-    if (settings.isNarrationEnabled && firstQuestionText) {
-      setTimeout(() => speak(firstQuestionText), 500);
-    }
-  };
-
-  const handleTournamentStart = () => {
-    setSetupMode('solo');
-    setShowPlayerSetup(true);
   };
 
   const handlePlayersReady = (players: Player[]) => {
@@ -369,19 +325,6 @@ const Index = () => {
     setGameMode("menu");
   };
 
-  const handleClaimDailyReward = () => {
-    const reward = dailyChallenge.claimReward();
-    if (reward.coins > 0) {
-      virtualShop.addCoins(reward.coins);
-      if (reward.item) {
-        // Note: Since the item is defined in the challenge hook, we need to ensure it's added to owned items.
-        // For simplicity, we assume the item ID is sufficient for the shop to recognize it.
-        virtualShop.purchaseItem(reward.item.id); 
-      }
-      celebration.celebrateAchievement();
-    }
-  };
-
   return (
     <div className="p-4 relative overflow-hidden min-h-screen overflow-y-auto">
       {/* Animated background elements */}
@@ -391,116 +334,47 @@ const Index = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
       </div>
 
-      <div className="w-full max-w-6xl mx-auto relative z-10">
-        {gameMode === "menu" && (
-          <MenuScreen
-            onStartSolo={handleStartSolo}
-            onStartMultiplayer={handleStartMultiplayer}
-            onStartMarathon={handleStartMarathon}
-            onStartStudy={handleStartStudy}
-            onStartTournament={handleStartTournament}
-            onStartStory={handleStartStory}
-            onStartCoop={handleStartCoopEntry} // Alterado para a nova tela de entrada
-            onShowRanking={() => {
-              ranking.loadRanking();
-              setShowRanking(true);
-            }}
-            onShowAchievements={() => setShowAchievements(true)}
-            onShowPowerUpShop={() => setShowPowerUpShop(true)}
-            onShowReview={handleStartReview}
-            onShowStats={handleShowStats}
-            onShowProfile={handleShowProfile}
-            isReviewAvailable={reviewHistory.hasIncorrectQuestions()}
-            isNarrationEnabled={settings.isNarrationEnabled}
-            onToggleNarration={toggleNarration}
-          />
-        )}
+      {/* Game Screens */}
+      <GameScreens
+        gameMode={gameMode}
+        setupMode={setupMode}
+        quiz={quiz}
+        coop={coop}
+        storyMode={storyMode}
+        playerLevel={playerLevel}
+        reviewHistory={reviewHistory}
+        settings={settings}
+        toggleNarration={toggleNarration}
+        speak={speak}
+        cancel={cancel}
+        showNextButton={showNextButton}
+        isGameOverState={isGameOverState}
+        dailyChallenge={dailyChallenge}
         
-        {gameMode === "coop_entry" && (
-          <CoopEntryScreen
-            onBack={() => setGameMode('menu')}
-            onEnterLobby={handleEnterCoopLobby}
-          />
-        )}
-        
-        {gameMode === "story" && (
-          <StoryModeScreen
-            chapters={storyMode.chapters}
-            onSelectChapter={handleSelectChapter}
-            onBack={() => setGameMode("menu")}
-            totalScore={playerLevel.totalScore}
-          />
-        )}
-
-        {gameMode === "marathon" && (
-          <MarathonMode
-            onStart={handleMarathonReady}
-            onBack={() => setGameMode("menu")}
-          />
-        )}
-
-        {gameMode === "study" && (
-          <StudyMode onBack={() => setGameMode("menu")} />
-        )}
-
-        {gameMode === "tournament" && (
-          <TournamentMode
-            onStart={handleTournamentStart}
-            onBack={() => setGameMode("menu")}
-          />
-        )}
-
-        {gameMode === "review" && (
-          <ReviewMode onBack={() => setGameMode("menu")} />
-        )}
-
-        {gameMode === "quiz" && quiz.currentQuestion && setupMode !== 'coop' && (
-          <QuizScreen
-            question={quiz.currentQuestion}
-            questionIndex={quiz.currentQuestionIndex}
-            totalQuestions={quiz.totalQuestions}
-            players={quiz.players}
-            currentPlayerIndex={quiz.currentPlayerIndex}
-            lives={quiz.lives}
-            hints={quiz.hints}
-            combo={quiz.combo}
-            timeRemaining={quiz.timeRemaining}
-            onAnswer={handleAnswer}
-            onNextQuestion={handleNextQuestion}
-            onUseHint={quiz.useHint}
-            onQuit={handleQuitQuiz}
-            gameMode={setupMode}
-            showNextButton={showNextButton}
-            isNarrationEnabled={settings.isNarrationEnabled}
-            onNarrate={speak}
-          />
-        )}
-        
-        {gameMode === "quiz" && quiz.currentQuestion && setupMode === 'coop' && coop.session && (
-          <CoopGameScreen
-            question={quiz.currentQuestion}
-            questionIndex={quiz.currentQuestionIndex}
-            totalQuestions={quiz.totalQuestions}
-            players={quiz.players}
-            currentPlayerIndex={quiz.currentPlayerIndex}
-            onAnswer={handleAnswer}
-            onNextQuestion={handleNextQuestion}
-            onQuit={handleQuitQuiz}
-            isNarrationEnabled={settings.isNarrationEnabled}
-            onNarrate={speak}
-          />
-        )}
-
-        {gameMode === "results" && (
-          <ResultsScreen
-            players={quiz.players}
-            gameMode={setupMode === 'coop' ? 'multiplayer' : setupMode}
-            isGameOver={isGameOverState}
-            onContinue={handleContinue}
-            onEndGame={handleEndGame}
-          />
-        )}
-      </div>
+        onStartSolo={handleStartSolo}
+        onStartMultiplayer={handleStartMultiplayer}
+        onStartMarathon={handleStartMarathon}
+        onStartStudy={handleStartStudy}
+        onStartTournament={handleStartTournament}
+        onStartStory={handleStartStory}
+        onStartCoopEntry={handleStartCoopEntry}
+        onShowRanking={handleShowRanking}
+        onShowAchievements={handleShowAchievements}
+        onShowPowerUpShop={handleShowPowerUpShop}
+        onShowReview={handleStartReview}
+        onShowStats={handleShowStats}
+        onShowProfile={handleShowProfile}
+        onSelectChapter={handleSelectChapter}
+        onEnterCoopLobby={handleEnterCoopLobby}
+        handleCoopGameStart={handleCoopGameStart}
+        handleCancelCoop={handleCancelCoop}
+        handleAnswer={handleAnswer}
+        handleNextQuestion={handleNextQuestion}
+        handleQuitQuiz={handleQuitQuiz}
+        handleContinue={handleContinue}
+        onSetGameMode={setGameMode}
+        handleEndGame={handleGameEnd}
+      />
 
       {/* Modals */}
       <PlayerSetup
@@ -510,45 +384,18 @@ const Index = () => {
         mode={setupMode === 'coop' ? 'multiplayer' : setupMode}
       />
 
-      <RankingModal
-        open={showRanking}
-        onClose={() => setShowRanking(false)}
-        ranking={ranking.ranking}
-      />
-
-      <AchievementsModal
-        open={showAchievements}
-        onClose={() => setShowAchievements(false)}
-        achievements={achievements.getAchievements()}
-      />
-
-      <VirtualShop
-        open={showPowerUpShop}
-        onClose={() => setShowPowerUpShop(false)}
-        shopItems={virtualShop.shopItems}
-        currency={virtualShop.currency}
-        onPurchase={virtualShop.purchaseItem}
-      />
-      
-      <StatsModal
-        open={showStats}
-        onClose={() => setShowStats(false)}
-      />
-      
-      {/* Coop Lobby agora é um estado de jogo */}
-      {gameMode === 'coop_lobby' && coop.session && (
-        <CoopLobby
-          onStartGame={handleCoopGameStart}
-          onCancel={handleCancelCoop}
-        />
-      )}
-
-      {/* Novo Modal de Perfil */}
-      <ProfileModal
-        open={showProfile}
-        onClose={() => setShowProfile(false)}
-        onStartChallenge={handleStartSolo}
-        onClaimReward={handleClaimDailyReward}
+      <GameModals
+        showRanking={showRanking}
+        setShowRanking={setShowRanking}
+        showAchievements={showAchievements}
+        setShowAchievements={setShowAchievements}
+        showPowerUpShop={showPowerUpShop}
+        setShowPowerUpShop={setShowPowerUpShop}
+        showStats={showStats}
+        setShowStats={setShowStats}
+        showProfile={showProfile}
+        setShowProfile={setShowProfile}
+        onStartSolo={handleStartSolo}
       />
 
       {/* AI Companion - sempre disponível */}
