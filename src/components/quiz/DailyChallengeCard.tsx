@@ -36,7 +36,7 @@ export function DailyChallengeCard({ onStartChallenge, onClaimReward }: DailyCha
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.8 }}
-      className="w-full max-w-md mx-auto"
+      className="w-full"
     >
       <Card className={`p-4 border-2 ${challenge.isCompleted ? 'border-success glow-success' : 'border-secondary/30'}`}>
         <div className="flex items-center justify-between mb-3">

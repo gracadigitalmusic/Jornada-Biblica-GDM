@@ -1,15 +1,19 @@
-import { RankingModal } from "@/components/quiz/RankingModal";
-import { AchievementsModal } from "@/components/quiz/AchievementsModal";
-import { VirtualShop } from "@/components/quiz/VirtualShop";
-import { StatsModal } from "@/components/quiz/StatsModal";
-import { ProfileModal } from "@/components/quiz/ProfileModal";
+import React, { Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
 import { useRanking } from "@/hooks/useRanking";
 import { useAchievements } from "@/hooks/useAchievements";
 import { useVirtualShop } from "@/hooks/useVirtualShop";
-import { useStats } from "@/hooks/useStats";
 import { useDailyChallenge } from "@/hooks/useDailyChallenge";
 import { useCelebration } from "@/hooks/useCelebration";
 import { useToast } from "@/hooks/use-toast";
+
+// Lazy imports for heavy modals
+const LazyRankingModal = React.lazy(() => import("@/components/quiz/RankingModal").then(mod => ({ default: mod.RankingModal })));
+const LazyAchievementsModal = React.lazy(() => import("@/components/quiz/AchievementsModal").then(mod => ({ default: mod.AchievementsModal })));
+const LazyVirtualShop = React.lazy(() => import("@/components/quiz/VirtualShop").then(mod => ({ default: mod.VirtualShop })));
+const LazyStatsModal = React.lazy(() => import("@/components/quiz/StatsModal").then(mod => ({ default: mod.StatsModal })));
+const LazyProfileModal = React.lazy(() => import("@/components/quiz/ProfileModal").then(mod => ({ default: mod.ProfileModal })));
+
 
 interface GameModalsProps {
   showRanking: boolean;
@@ -62,38 +66,48 @@ export function GameModals({
   };
 
   return (
-    <>
-      <RankingModal
-        open={showRanking}
-        onClose={() => setShowRanking(false)}
-        ranking={ranking.ranking}
-      />
+    <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"><Loader2 className="w-12 h-12 animate-spin text-primary" /></div>}>
+      {showRanking && (
+        <LazyRankingModal
+          open={showRanking}
+          onClose={() => setShowRanking(false)}
+          ranking={ranking.ranking}
+        />
+      )}
 
-      <AchievementsModal
-        open={showAchievements}
-        onClose={() => setShowAchievements(false)}
-        achievements={achievements.getAchievements()}
-      />
+      {showAchievements && (
+        <LazyAchievementsModal
+          open={showAchievements}
+          onClose={() => setShowAchievements(false)}
+          achievements={achievements.getAchievements()}
+        />
+      )}
 
-      <VirtualShop
-        open={showPowerUpShop}
-        onClose={() => setShowPowerUpShop(false)}
-        shopItems={virtualShop.shopItems}
-        currency={virtualShop.currency}
-        onPurchase={virtualShop.purchaseItem}
-      />
+      {showPowerUpShop && (
+        <LazyVirtualShop
+          open={showPowerUpShop}
+          onClose={() => setShowPowerUpShop(false)}
+          shopItems={virtualShop.shopItems}
+          currency={virtualShop.currency}
+          onPurchase={virtualShop.purchaseItem}
+        />
+      )}
       
-      <StatsModal
-        open={showStats}
-        onClose={() => setShowStats(false)}
-      />
+      {showStats && (
+        <LazyStatsModal
+          open={showStats}
+          onClose={() => setShowStats(false)}
+        />
+      )}
       
-      <ProfileModal
-        open={showProfile}
-        onClose={() => setShowProfile(false)}
-        onStartChallenge={onStartSolo}
-        onClaimReward={handleClaimDailyReward}
-      />
-    </>
+      {showProfile && (
+        <LazyProfileModal
+          open={showProfile}
+          onClose={() => setShowProfile(false)}
+          onStartChallenge={onStartSolo}
+          onClaimReward={handleClaimDailyReward}
+        />
+      )}
+    </Suspense>
   );
 }

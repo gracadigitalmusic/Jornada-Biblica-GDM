@@ -54,6 +54,8 @@ export function CoopGameScreen({
   const currentPlayer = players[currentPlayerIndex];
   const isMyTurn = coop.currentPlayer?.name === currentPlayer.name;
   const timePercent = (timeRemaining / GAME_CONSTANTS.TIME_PER_QUESTION) * 100;
+  const comboGlowClass = coop.session?.sharedLives && coop.session.sharedLives > 3 ? 'animate-combo-glow glow-secondary' : '';
+
 
   // --- Timer Logic ---
   useEffect(() => {
@@ -100,37 +102,83 @@ export function CoopGameScreen({
   useEffect(() => {
     if (!coop.session) return;
 
-    const channel = supabase.channel(`coop-session-${coop.session.id}`);
-    
-    const handleBroadcast = ({ payload }: { payload: any }) => {
-      switch (payload.event) {
-        case 'answer-selected':
-          // Only process if it's not my answer
-          if (payload.userId !== coop.myUserId) {
-            handleAnswerReceived(payload.index, payload.isCorrect);
-          }
-          break;
-        case 'hint-used':
-          setDisabledIndices(payload.disabledIndices);
-          toast({
-            title: "Dica Usada!",
-            description: `${payload.playerName} eliminou duas opções.`,
-            variant: "default", // Corrigido: usando 'default' ou 'destructive'
+    const channel = supabase
+      .channel(`coop-session-${coop.session.id}`)
+      .on(
+        'presence',
+        { event: 'sync' },
+        () => {
+          const state = channel.presenceState();
+          const activePlayers: CoopPlayer[] = [];
+          
+          Object.values(state).forEach((presences: any) => {
+            presences.forEach((presence: any) => {
+              activePlayers.push(presence.payload as CoopPlayer);
+            });
           });
-          break;
-        case 'next-question':
-          onNextQuestion();
-          break;
-        case 'game-over':
-          onQuit(); // Should lead to results screen
-          break;
-      }
-    };
-
-    channel.on('broadcast', { event: 'answer-selected' }, handleBroadcast).subscribe();
-    channel.on('broadcast', { event: 'hint-used' }, handleBroadcast).subscribe();
-    channel.on('broadcast', { event: 'next-question' }, handleBroadcast).subscribe();
-    channel.on('broadcast', { event: 'game-over' }, handleBroadcast).subscribe();
+          
+          // Atualiza o hostId se o host original sair e um novo for necessário (lógica simplificada)
+          if (activePlayers.length > 0 && !activePlayers.some(p => p.userId === coop.session?.hostId)) {
+            // Se o host original saiu, o primeiro jogador ativo se torna o novo host
+            const newHostId = activePlayers[0].userId;
+            coop.setSession(prev => prev ? { ...prev, hostId: newHostId } : null);
+            coop.setIsHost(newHostId === coop.myUserId);
+          }
+        }
+      )
+      .on(
+        'presence',
+        { event: 'join' },
+        ({ newPresences }) => {
+          const newPlayer = (newPresences[0] as any).payload as CoopPlayer;
+          toast({
+            title: "Novo jogador!",
+            description: `${newPlayer.name} entrou no time.`,
+          });
+        }
+      )
+      .on(
+        'presence',
+        { event: 'leave' },
+        ({ leftPresences }) => {
+          const leftPlayer = (leftPresences[0] as any).payload as CoopPlayer;
+          toast({
+            title: "Jogador saiu",
+            description: `${leftPlayer.name} deixou o time.`,
+            variant: "destructive",
+          });
+        }
+      )
+      .on(
+        'broadcast',
+        { event: 'lives-update' },
+        ({ payload }) => {
+          coop.setSession(prev => prev ? { ...prev, sharedLives: payload.lives } : null);
+        }
+      )
+      .on(
+        'broadcast',
+        { event: 'powerup-used' },
+        ({ payload }) => {
+          coop.setSession(prev => prev ? { 
+            ...prev, 
+            sharedPowerUps: payload.powerUps 
+          } : null);
+          toast({
+            title: "Power-up usado!",
+            description: `${payload.playerName} usou ${payload.powerUpName}`,
+          });
+        }
+      )
+      .on(
+        'broadcast',
+        { event: 'game-start' },
+        () => {
+          coop.setSession(prev => prev ? { ...prev, status: 'playing' } : null);
+          // O Index.tsx deve capturar a mudança de estado para iniciar o quiz
+        }
+      )
+      .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
@@ -210,6 +258,8 @@ export function CoopGameScreen({
       if (idx !== question.answer && !disabledIndices.includes(idx)) {
         wrongIndices.push(idx);
       }
+      // Ensure we don't disable the correct answer
+      if (idx === question.answer) return;
     });
 
     const indicesToDisable = wrongIndices.slice(0, 2);
@@ -247,7 +297,7 @@ export function CoopGameScreen({
   return (
     <div className="space-y-4">
       {/* Timer Bar */}
-      <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+      <div className="relative h-2 bg-muted rounded-full overflow-hidden will-change-transform">
         <motion.div
           className="absolute inset-y-0 left-0 bg-gradient-to-r from-secondary to-primary"
           initial={{ width: "100%" }}
@@ -291,7 +341,7 @@ export function CoopGameScreen({
             key={currentPlayer.name}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className={`flex items-center gap-2 font-semibold ${isMyTurn ? 'text-primary' : 'text-muted-foreground'}`}
+            className={`flex items-center gap-2 font-semibold ${isMyTurn ? 'text-primary' : 'text-muted-foreground'} will-change-transform`}
           >
             <span className="text-2xl">{currentPlayer.avatar}</span>
             <span>{isMyTurn ? 'Sua Vez!' : `Turno de: ${currentPlayer.name}`}</span>
@@ -324,13 +374,14 @@ export function CoopGameScreen({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className={`
-          bg-quiz-card rounded-2xl p-6 border-2 transition-all duration-300
+          bg-quiz-card rounded-2xl p-6 border-2 transition-all duration-300 will-change-transform
           ${showFeedback 
             ? feedbackType === 'correct' 
               ? 'border-success glow-success' 
-              : 'border-destructive animate-[shake_0.5s_ease]'
+              : 'border-destructive animate-[shake_0.5s_ease] glow-destructive'
             : 'border-border'
           }
+          ${!showFeedback && comboGlowClass}
         `}
       >
         <h2 className="text-xl md:text-2xl font-bold mb-6 text-foreground">
@@ -360,7 +411,7 @@ export function CoopGameScreen({
                   onClick={() => handleSelectOption(index)}
                   disabled={selectedIndex !== null || isDisabled || !isMyTurn}
                   className={`
-                    p-4 rounded-xl text-left font-medium transition-all duration-300
+                    p-4 rounded-xl text-left font-medium transition-all duration-300 will-change-transform
                     disabled:cursor-not-allowed
                     ${showCorrect 
                       ? 'bg-success text-success-foreground border-2 border-success' 
@@ -418,7 +469,7 @@ export function CoopGameScreen({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center"
+          className="text-center will-change-transform"
         >
           <Button 
             size="lg" 

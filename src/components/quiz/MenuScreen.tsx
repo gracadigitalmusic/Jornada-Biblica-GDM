@@ -140,7 +140,7 @@ const ModeButton = ({ mode, props, delay }: ModeButtonProps) => {
       animate={{ opacity: 1, y: 0 }} 
       transition={{ delay: delay, duration: 0.3 }} 
       whileHover={isAvailable ? { scale: 1.05, boxShadow: `0 0 20px ${glowClass}` } : {}}
-      className={`h-full ${!isAvailable ? 'opacity-50 cursor-not-allowed' : ''}`}
+      className={`h-full ${!isAvailable ? 'opacity-50 cursor-not-allowed' : ''} will-change-transform`}
     >
       <button 
         onClick={() => isAvailable && mode.onClick(props)} 
@@ -185,7 +185,7 @@ export function MenuScreen(props: MenuScreenProps) {
           initial={{ scale: 0.9, opacity: 0 }} 
           animate={{ scale: 1, opacity: 1 }} 
           transition={{ delay: 0.2, duration: 0.5 }} 
-          className="flex flex-col items-center"
+          className="flex flex-col items-center will-change-transform"
         >
           <img 
             src="/logo_jogo.png" 
@@ -199,12 +199,6 @@ export function MenuScreen(props: MenuScreenProps) {
         </motion.div>
       </div>
       
-      {/* Desafio Diário - Novo elemento na tela principal */}
-      <DailyChallengeCard 
-        onStartChallenge={props.onStartSolo} 
-        onClaimReward={props.onClaimReward} 
-      />
-
       {/* Main Content Grid - Modos de Jogo (Todos juntos em uma grade maior) */}
       <Card className="p-6 bg-quiz-card/50 backdrop-blur border-primary/20">
         <CardTitle className="text-xl font-bold mb-6 flex items-center justify-center gap-2 text-gradient-primary">
@@ -241,6 +235,14 @@ export function MenuScreen(props: MenuScreenProps) {
           </Button>
         </div>
       </motion.div>
+      
+      {/* Desafio Diário - Movido para o final da tela */}
+      <div className="mt-8 max-w-md mx-auto">
+        <DailyChallengeCard 
+          onStartChallenge={props.onStartSolo} 
+          onClaimReward={props.onClaimReward} 
+        />
+      </div>
     </motion.div>
   );
 }

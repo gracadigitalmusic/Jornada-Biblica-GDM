@@ -62,6 +62,7 @@ export function QuizScreen({
 
   const currentPlayer = players[currentPlayerIndex];
   const timePercent = (timeRemaining / GAME_CONSTANTS.TIME_PER_QUESTION) * 100;
+  const comboGlowClass = combo >= 3 ? 'animate-combo-glow glow-secondary' : '';
 
   useEffect(() => {
     // Reset state when question changes
@@ -189,7 +190,7 @@ export function QuizScreen({
   return (
     <div className="space-y-4">
       {/* Timer Bar */}
-      <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+      <div className="relative h-2 bg-muted rounded-full overflow-hidden will-change-transform">
         <motion.div
           className="absolute inset-y-0 left-0 bg-gradient-to-r from-secondary to-primary"
           initial={{ width: "100%" }}
@@ -232,10 +233,15 @@ export function QuizScreen({
 
           {/* Current Player Turn */}
           {gameMode === 'multiplayer' && (
-            <div className="flex items-center gap-2 text-secondary font-semibold">
+            <motion.div
+              key={currentPlayer.name}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-2 text-secondary font-semibold will-change-transform"
+            >
               <span className="text-2xl">{currentPlayer.avatar}</span>
               <span>Turno de: {currentPlayer.name}</span>
-            </div>
+            </motion.div>
           )}
 
           {/* Combo */}
@@ -243,7 +249,7 @@ export function QuizScreen({
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="flex items-center gap-2 text-secondary font-bold animate-streak"
+              className="flex items-center gap-2 text-secondary font-bold animate-streak will-change-transform"
             >
               <Zap className="w-5 h-5" />
               <span>COMBO x{combo}!</span>
@@ -287,13 +293,14 @@ export function QuizScreen({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className={`
-          bg-quiz-card rounded-2xl p-6 border-2 transition-all duration-300
+          bg-quiz-card rounded-2xl p-6 border-2 transition-all duration-300 will-change-transform
           ${showFeedback 
             ? feedbackType === 'correct' 
               ? 'border-success glow-success' 
-              : 'border-destructive animate-[shake_0.5s_ease]'
+              : 'border-destructive animate-[shake_0.5s_ease] glow-destructive'
             : 'border-border'
           }
+          ${!showFeedback && comboGlowClass}
         `}
       >
         <h2 className="text-xl md:text-2xl font-bold mb-6 text-foreground">
@@ -323,7 +330,7 @@ export function QuizScreen({
                   onClick={() => handleSelectOption(index)}
                   disabled={selectedIndex !== null || isDisabled}
                   className={`
-                    p-4 rounded-xl text-left font-medium transition-all duration-300
+                    p-4 rounded-xl text-left font-medium transition-all duration-300 will-change-transform
                     disabled:cursor-not-allowed
                     ${showCorrect 
                       ? 'bg-success text-success-foreground border-2 border-success' 
@@ -403,7 +410,7 @@ export function QuizScreen({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center"
+          className="text-center will-change-transform"
         >
           <Button 
             size="lg" 

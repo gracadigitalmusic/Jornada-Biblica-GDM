@@ -134,6 +134,12 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+  /* GPU Acceleration Utility */
+  .will-change-transform {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+  
   /* Glow animations */
   @keyframes glow-pulse {
     0%, 100% {
@@ -143,6 +149,15 @@ All colors MUST be HSL.
     50% {
       box-shadow: 0 0 30px hsl(var(--quiz-glow-primary) / 0.5),
                   0 0 60px hsl(var(--quiz-glow-primary) / 0.2);
+    }
+  }
+  
+  @keyframes combo-pulse {
+    0%, 100% {
+      box-shadow: 0 0 15px hsl(var(--quiz-glow-secondary) / 0.5);
+    }
+    50% {
+      box-shadow: 0 0 25px hsl(var(--quiz-glow-secondary) / 0.8);
     }
   }
   
@@ -190,6 +205,10 @@ All colors MUST be HSL.
   
   .animate-glow {
     animation: glow-pulse 2s ease-in-out infinite;
+  }
+  
+  .animate-combo-glow {
+    animation: combo-pulse 1s ease-in-out infinite alternate;
   }
   
   .animate-float {
