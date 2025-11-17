@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Trophy, Users, User, Zap, Award, Volume2, VolumeX, TrendingUp, ShoppingBag, Network, Infinity, Globe, Database, Target, Share2, Crown, BookOpen, BookMarked, Settings, LucideProps, Download, Sparkles } from "lucide-react";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
-import { DailyChallengeCard } from "./DailyChallengeCard";
+// import { DailyChallengeCard } from "./DailyChallengeCard"; // Removido
 
 interface MenuScreenProps {
   onStartSolo: () => void;
@@ -266,13 +266,13 @@ export function MenuScreen(props: MenuScreenProps) {
         </div>
       </motion.div>
       
-      {/* Desafio Diário - Movido para o final da tela */}
-      <div className="mt-8 max-w-md mx-auto">
+      {/* Desafio Diário - Removido da tela principal */}
+      {/* <div className="mt-8 max-w-md mx-auto">
         <DailyChallengeCard 
           onStartChallenge={props.onStartSolo} 
           onClaimReward={props.onClaimReward} 
         />
-      </div>
+      </div> */}
     </motion.div>
   );
 }
