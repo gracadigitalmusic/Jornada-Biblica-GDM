@@ -163,10 +163,10 @@ export function MenuScreen(props: MenuScreenProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="text-center space-y-8 relative max-w-4xl mx-auto pt-12 pb-12"
+      className="text-center space-y-8 relative max-w-4xl mx-auto pt-8 pb-8"
     >
       {/* Top Bar & Logo */}
-      <div className="flex flex-col items-center justify-center mb-10">
+      <div className="flex flex-col items-center justify-center mb-8">
         {/* Botões de Configuração (Movidos para o topo) */}
         <div className="absolute top-0 right-0 flex items-center gap-2">
           <Button onClick={props.onShowProfile} variant="ghost" size="icon" className="text-primary hover:bg-primary/10">
@@ -213,7 +213,7 @@ export function MenuScreen(props: MenuScreenProps) {
         initial={{ opacity: 0, y: 20 }} 
         animate={{ opacity: 1, y: 0 }} 
         transition={{ delay: 1.2 }} 
-        className="mt-8 pt-4 border-t border-border/50"
+        className="mt-6 pt-4 border-t border-border/50"
       >
         <h3 className="text-lg font-bold mb-4 text-muted-foreground">Hall da Fama & Loja</h3>
         <div className="flex flex-wrap justify-center gap-4">
