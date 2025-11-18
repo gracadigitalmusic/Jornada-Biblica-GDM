@@ -266,7 +266,7 @@ export function QuizScreen({
               <span className="text-2xl">{currentPlayer.avatar}</span>
               <div>
                 <div className="text-lg font-bold">{currentPlayer.name}</div>
-                <div className="text-2xl font-black text-primary">{currentPlayer.score} pts</div>
+                <div className="text-4xl font-black text-gradient-primary">{currentPlayer.score} pts</div>
               </div>
             </div>
           ) : (

@@ -14,7 +14,6 @@ import { useStoryMode } from "@/hooks/useStoryMode";
 import { useVirtualShop } from "@/hooks/useVirtualShop";
 import { useStats } from "@/hooks/useStats";
 import { useDailyChallenge } from "@/hooks/useDailyChallenge";
-import { useCoopMode } from "@/hooks/useCoopMode";
 import { useOfflineMode } from "@/hooks/useOfflineMode";
 import { Player, GameMode } from "@/types/quiz";
 import { GAME_CONSTANTS } from "@/data/questions";
@@ -26,7 +25,7 @@ const LazyGameScreens = lazy(() => import("@/components/quiz/GameScreens").then(
 
 const Index = () => {
   const [gameMode, setGameMode] = useState<GameMode>("menu");
-  const [setupMode, setSetupMode] = useState<'solo' | 'multiplayer' | 'coop'>('solo');
+  const [setupMode, setSetupMode] = useState<'solo' | 'multiplayer'>('solo'); // Removido 'coop'
   const [showPlayerSetup, setShowPlayerSetup] = useState(false);
   const [showRanking, setShowRanking] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
@@ -47,7 +46,6 @@ const Index = () => {
   const { speak, cancel } = useNarration();
   const storyMode = useStoryMode();
   const virtualShop = useVirtualShop();
-  const coop = useCoopMode();
   const stats = useStats();
   const dailyChallenge = useDailyChallenge();
   const offlineMode = useOfflineMode();
@@ -62,10 +60,10 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    if (gameMode === "quiz" && setupMode !== 'coop' && quiz.timeRemaining <= 0 && !showResults) {
+    if (gameMode === "quiz" && quiz.timeRemaining <= 0 && !showResults) {
       handleTimeout();
     }
-  }, [quiz.timeRemaining, gameMode, showResults, setupMode]);
+  }, [quiz.timeRemaining, gameMode, showResults]);
 
   useEffect(() => {
     return () => {
@@ -77,10 +75,7 @@ const Index = () => {
     setGameMode("menu");
     setShowResults(false);
     setIsGameOverState(false);
-    if (setupMode === 'coop') {
-      coop.leaveSession();
-    }
-  }, [setGameMode, setShowResults, setIsGameOverState, setupMode, coop]);
+  }, [setGameMode, setShowResults, setIsGameOverState]);
 
   const handleQuitQuiz = () => {
     if (confirm("Tem certeza que deseja sair? Seu progresso será perdido.")) {
@@ -193,43 +188,19 @@ const Index = () => {
   const handleShowStats = () => setShowStats(true);
   const handleShowProfile = () => setShowProfile(true);
 
-  const handleStartCoopEntry = () => setGameMode('coop_entry');
-  
-  const handleEnterCoopLobby = () => {
-    setGameMode('coop_lobby');
-    setSetupMode('coop');
-  };
+  // Removido handlers de CO-OP
+  const handleStartCoopEntry = () => {};
+  const handleEnterCoopLobby = () => {};
+  const handleCoopGameStart = () => {};
+  const handleCancelCoop = () => {};
 
   const handleSelectChapter = (chapterId: string) => {
     storyMode.setCurrentChapter(chapterId);
     const lastUser = localStorage.getItem('jb_last_user');
     const hostPlayer = lastUser ? JSON.parse(lastUser) : { name: 'Peregrino', location: 'Story Mode', score: 0, avatar: '👑' };
-    coop.createSession(hostPlayer, `Jornada ${chapterId}`, 4, chapterId);
-    setSetupMode('coop');
-    setGameMode('coop_lobby');
-  };
-
-  const handleCoopGameStart = async () => {
-    const playersList: Player[] = coop.players.map(p => ({ 
-      name: p.name, 
-      location: coop.session?.teamName || 'Co-op', 
-      score: 0, 
-      avatar: p.avatar 
-    }));
     
-    const numQuestions = 10; 
-    const firstQuestionText = await quiz.initializeGame(playersList, numQuestions, offlineMode.loadOfflineQuestions);
-    setGameMode('quiz');
-    
-    if (settings.isNarrationEnabled && firstQuestionText) {
-      setTimeout(() => speak(firstQuestionText), 500);
-    }
-  };
-
-  const handleCancelCoop = () => {
-    coop.leaveSession();
-    setGameMode('menu');
-    setSetupMode('solo');
+    // Inicia o modo história como um jogo solo de 10 perguntas
+    handlePlayersReady([hostPlayer]);
   };
 
   const handlePlayersReady = async (players: Player[]) => {
@@ -271,10 +242,6 @@ const Index = () => {
     
     if (!result.correct && quiz.currentQuestion) {
       reviewHistory.addIncorrectQuestion(quiz.currentQuestion.id);
-      
-      if (setupMode === 'coop' && coop.session) {
-        coop.updateLives(coop.session.sharedLives - 1);
-      }
     }
     
     achievements.logAnswer(
@@ -285,13 +252,8 @@ const Index = () => {
       () => celebration.celebrateAchievement()
     );
 
-    if (setupMode !== 'coop') {
-      setShowResults(true);
-      setShowNextButton(true);
-    } else {
-      // In coop, the answer is processed, but the screen waits for the host to advance
-      // The CoopGameScreen handles the visual feedback based on the local answer/broadcast
-    }
+    setShowResults(true);
+    setShowNextButton(true);
 
     if (settings.isNarrationEnabled && quiz.currentQuestion?.explanation) {
       const answerText = `A resposta correta é: ${quiz.currentQuestion.options[quiz.currentQuestion.answer]}. ${quiz.currentQuestion.explanation}`;
@@ -303,7 +265,7 @@ const Index = () => {
     cancel();
     setShowNextButton(false);
     
-    if (quiz.isGameOver() || (setupMode === 'coop' && (coop.session?.sharedLives || 0) <= 0)) {
+    if (quiz.isGameOver()) {
       handleGameEnd();
     } else {
       const nextQuestionText = quiz.nextQuestion();
@@ -324,7 +286,7 @@ const Index = () => {
   };
 
   return (
-    <div className="relative overflow-hidden min-h-screen overflow-y-auto"> {/* Removido p-4 aqui */}
+    <div className="relative overflow-hidden min-h-screen overflow-y-auto">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-float" />
@@ -342,7 +304,8 @@ const Index = () => {
           gameMode={gameMode}
           setupMode={setupMode}
           quiz={quiz}
-          coop={coop}
+          // Passando um mock vazio para coop, já que foi removido
+          coop={{ session: null, players: [], currentPlayer: null, isHost: false, myUserId: null, setSession: () => {}, setIsHost: () => {}, createSession: async () => '', joinSession: async () => {}, toggleReady: async () => {}, startGame: async () => false, updateLives: async () => {}, usePowerUp: async () => {}, leaveSession: async () => {} } as any}
           storyMode={storyMode}
           playerLevel={playerLevel}
           reviewHistory={reviewHistory}
@@ -386,7 +349,7 @@ const Index = () => {
         open={showPlayerSetup}
         onClose={() => setShowPlayerSetup(false)}
         onStart={handlePlayersReady}
-        mode={setupMode === 'coop' ? 'multiplayer' : setupMode}
+        mode={setupMode}
       />
 
       <GameModals

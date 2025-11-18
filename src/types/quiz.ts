@@ -44,7 +44,7 @@ export interface RankingEntry {
   avatar: string;
 }
 
-export type GameMode = 'menu' | 'solo' | 'multiplayer' | 'marathon' | 'study' | 'tournament' | 'quiz' | 'results' | 'review' | 'story' | 'shop' | 'coop_entry' | 'coop_lobby';
+export type GameMode = 'menu' | 'solo' | 'multiplayer' | 'marathon' | 'study' | 'tournament' | 'quiz' | 'results' | 'review' | 'story' | 'shop';
 
 export interface PowerUp {
   id: string;

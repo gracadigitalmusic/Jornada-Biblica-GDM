@@ -6,25 +6,20 @@ import { StudyMode } from "@/components/quiz/StudyMode";
 import { TournamentMode } from "@/components/quiz/TournamentMode";
 import { ReviewMode } from "@/components/quiz/ReviewMode";
 import { QuizScreen } from "@/components/quiz/QuizScreen";
-import { CoopGameScreen } from "@/components/quiz/CoopGameScreen";
 import { ResultsScreen } from "@/components/quiz/ResultsScreen";
-import { CoopLobby } from "@/components/quiz/CoopLobby";
-import { CoopEntryScreen } from "@/components/quiz/CoopEntryScreen";
 import { useQuizGame } from "@/hooks/useQuizGame";
 import { useReviewHistory } from "@/hooks/useReviewHistory";
 import { useGameSettings } from "@/hooks/useGameSettings";
 import { useNarration } from "@/hooks/useNarration";
 import { useStoryMode } from "@/hooks/useStoryMode";
 import { usePlayerLevel } from "@/hooks/usePlayerLevel";
-import { useCoopMode } from "@/hooks/useCoopMode";
 import { useDailyChallenge } from "@/hooks/useDailyChallenge";
 import { useOfflineMode } from "@/hooks/useOfflineMode"; // Importando o hook
 
 interface GameScreensProps {
   gameMode: GameMode;
-  setupMode: 'solo' | 'multiplayer' | 'coop';
+  setupMode: 'solo' | 'multiplayer'; // Removido 'coop'
   quiz: ReturnType<typeof useQuizGame>;
-  coop: ReturnType<typeof useCoopMode>;
   storyMode: ReturnType<typeof useStoryMode>;
   playerLevel: ReturnType<typeof usePlayerLevel>;
   reviewHistory: ReturnType<typeof useReviewHistory>;
@@ -67,7 +62,6 @@ export function GameScreens({
   gameMode,
   setupMode,
   quiz,
-  coop,
   storyMode,
   playerLevel,
   reviewHistory,
@@ -153,12 +147,7 @@ export function GameScreens({
         />
       )}
       
-      {gameMode === "coop_entry" && (
-        <CoopEntryScreen
-          onBack={() => onSetGameMode('menu')}
-          onEnterLobby={onEnterCoopLobby}
-        />
-      )}
+      {/* Removido coop_entry */}
       
       {gameMode === "story" && (
         <StoryModeScreen
@@ -191,7 +180,7 @@ export function GameScreens({
         <ReviewMode onBack={() => onSetGameMode('menu')} />
       )}
 
-      {gameMode === "quiz" && quiz.currentQuestion && setupMode !== 'coop' && (
+      {gameMode === "quiz" && quiz.currentQuestion && (
         <QuizScreen
           {...quizScreenProps}
           lives={quiz.lives}
@@ -204,29 +193,19 @@ export function GameScreens({
         />
       )}
       
-      {gameMode === "quiz" && quiz.currentQuestion && setupMode === 'coop' && coop.session && (
-        <CoopGameScreen
-          {...quizScreenProps}
-          // CoopGameScreen uses internal state for lives/hints/time
-        />
-      )}
+      {/* Removido CoopGameScreen */}
 
       {gameMode === "results" && (
         <ResultsScreen
           players={quiz.players}
-          gameMode={setupMode === 'coop' ? 'multiplayer' : setupMode}
+          gameMode={setupMode}
           isGameOver={isGameOverState}
           onContinue={handleContinue}
           onEndGame={handleEndGame}
         />
       )}
       
-      {gameMode === 'coop_lobby' && coop.session && (
-        <CoopLobby
-          onStartGame={handleCoopGameStart}
-          onCancel={handleCancelCoop}
-        />
-      )}
+      {/* Removido coop_lobby */}
     </div>
   );
 }

@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Trophy, Users, User, Zap, Award, Volume2, VolumeX, TrendingUp, ShoppingBag, Network, Infinity, Globe, Database, Target, Share2, Crown, BookOpen, BookMarked, Settings, LucideProps, Download, Sparkles } from "lucide-react";
+import { Trophy, Users, User, Zap, Award, Volume2, VolumeX, TrendingUp, ShoppingBag, Network, Infinity, Globe, Database, Target, Crown, BookOpen, BookMarked, Settings, LucideProps, Download, Sparkles, Heart, Shield, Lightbulb } from "lucide-react";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
-// import { DailyChallengeCard } from "./DailyChallengeCard"; // Removido
 
 interface MenuScreenProps {
   onStartSolo: () => void;
@@ -71,7 +70,7 @@ const GAME_MODES: GameModeDefinition[] = [
     id: 'multiplayer', 
     title: "Multiplayer Local", 
     subtitle: "Batalha de 2 a 5 jogadores", 
-    icon: Network, 
+    icon: Users, 
     onClick: (props: MenuScreenProps) => props.onStartMultiplayer(), 
     color: 'accent',
     glow: 'glow-secondary'
@@ -82,15 +81,6 @@ const GAME_MODES: GameModeDefinition[] = [
     subtitle: "Jornada narrativa imersiva", 
     icon: Globe, 
     onClick: (props: MenuScreenProps) => props.onStartStory(), 
-    color: 'primary',
-    glow: 'glow-primary'
-  },
-  { 
-    id: 'coop', 
-    title: "Co-op Online", 
-    subtitle: "Jogue em equipe (Beta)", 
-    icon: Share2, 
-    onClick: (props: MenuScreenProps) => props.onStartCoop(), 
     color: 'primary',
     glow: 'glow-primary'
   },
@@ -166,12 +156,12 @@ export function MenuScreen(props: MenuScreenProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="text-center space-y-8 relative max-w-6xl mx-auto pt-0 pb-8 px-4" // pt-0 e px-4 adicionados
+      className="text-center space-y-8 relative max-w-6xl mx-auto pb-8 px-4 pt-4" // Ajustado pt-4
     >
       {/* Top Bar & Logo */}
       <div className="flex flex-col items-center justify-center mb-8 relative">
         {/* Botões de Configuração */}
-        <div className="absolute top-0 right-0 flex items-center gap-2 pt-4 pr-4"> {/* Adicionado pt-4 pr-4 */}
+        <div className="absolute top-0 right-0 flex items-center gap-2 pt-4 pr-4">
           <Button onClick={props.onShowProfile} variant="ghost" size="icon" className="text-primary hover:bg-primary/10">
             <User className="w-5 h-5" />
           </Button>
@@ -185,7 +175,7 @@ export function MenuScreen(props: MenuScreenProps) {
           initial={{ scale: 0.8, opacity: 0 }} 
           animate={{ scale: 1, opacity: 1 }} 
           transition={{ delay: 0.2, duration: 0.6, type: "spring", stiffness: 100 }} 
-          className="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center mb-6 mt-12 will-change-transform" // mt-12 ajustado
+          className="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center mb-6 mt-4 will-change-transform" // mt-4 ajustado
         >
           <div className="absolute inset-0 rounded-full orb-background animate-orb-pulse" />
           <img 
