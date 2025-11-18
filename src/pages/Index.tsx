@@ -25,7 +25,7 @@ const LazyGameScreens = lazy(() => import("@/components/quiz/GameScreens").then(
 
 const Index = () => {
   const [gameMode, setGameMode] = useState<GameMode>("menu");
-  const [setupMode, setSetupMode] = useState<'solo' | 'multiplayer'>('solo'); // Removido 'coop'
+  const [setupMode, setSetupMode] = useState<'solo' | 'multiplayer'>('solo');
   const [showPlayerSetup, setShowPlayerSetup] = useState(false);
   const [showRanking, setShowRanking] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
@@ -56,7 +56,7 @@ const Index = () => {
     }, 200);
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener('change', handleResize);
   }, []);
 
   useEffect(() => {
@@ -304,8 +304,6 @@ const Index = () => {
           gameMode={gameMode}
           setupMode={setupMode}
           quiz={quiz}
-          // Passando um mock vazio para coop, já que foi removido
-          coop={{ session: null, players: [], currentPlayer: null, isHost: false, myUserId: null, setSession: () => {}, setIsHost: () => {}, createSession: async () => '', joinSession: async () => {}, toggleReady: async () => {}, startGame: async () => false, updateLives: async () => {}, usePowerUp: async () => {}, leaveSession: async () => {} } as any}
           storyMode={storyMode}
           playerLevel={playerLevel}
           reviewHistory={reviewHistory}
