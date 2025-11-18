@@ -251,7 +251,7 @@ export function QuizScreen({
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="flex items-center gap-2 text-secondary font-bold animate-streak will-change-transform"
+              className="flex items-center gap-2 text-secondary font-bold animate-pulse-scale will-change-transform"
             >
               <Zap className="w-5 h-5" />
               <span>COMBO x{combo}!</span>
@@ -337,7 +337,7 @@ export function QuizScreen({
                     ${showCorrect 
                       ? 'bg-success text-success-foreground border-2 border-success' 
                       : showWrong
-                      ? 'bg-destructive/20 text-destructive border-2 border-destructive'
+                      ? 'bg-destructive/20 text-destructive border-2 border-destructive animate-shake'
                       : isDisabled
                       ? 'bg-muted/20 text-muted-foreground line-through'
                       : 'bg-quiz-card hover:bg-quiz-card-hover border-2 border-border hover:border-primary'

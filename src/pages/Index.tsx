@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { PlayerSetup } from "@/components/quiz/PlayerSetup";
 import { GameModals } from "@/components/quiz/GameModals";
 import { GameScreens } from "@/components/quiz/GameScreens";
@@ -19,10 +19,6 @@ import { useOfflineMode } from "@/hooks/useOfflineMode";
 import { Player, GameMode } from "@/types/quiz";
 import { GAME_CONSTANTS } from "@/data/questions";
 import { Loader2 } from "lucide-react";
-import { throttle } from "lodash-es";
-
-// Dynamic Imports for Code Splitting
-const LazyGameScreens = lazy(() => import("@/components/quiz/GameScreens").then(mod => ({ default: mod.GameScreens })));
 
 const Index = () => {
   const [gameMode, setGameMode] = useState<GameMode>("menu");
@@ -52,13 +48,21 @@ const Index = () => {
   const dailyChallenge = useDailyChallenge();
   const offlineMode = useOfflineMode();
 
+  // Use local performance throttle para otimizar
   useEffect(() => {
-    const handleResize = throttle(() => {
-      // Lógica de redimensionamento otimizada
-    }, 200);
+    let resizeTimeout: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        // Lógica de redimensionamento otimizada se necessário
+      }, 200);
+    };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimeout);
+    };
   }, []);
 
   useEffect(() => {
@@ -332,54 +336,48 @@ const Index = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
       </div>
 
-      {/* Game Screens (Lazy Loaded) */}
-      <Suspense fallback={
-        <div className="flex min-h-screen items-center justify-center">
-          <Loader2 className="w-12 h-12 animate-spin text-primary" />
-        </div>
-      }>
-        <LazyGameScreens
-          gameMode={gameMode}
-          setupMode={setupMode}
-          quiz={quiz}
-          coop={coop}
-          storyMode={storyMode}
-          playerLevel={playerLevel}
-          reviewHistory={reviewHistory}
-          settings={settings}
-          toggleNarration={toggleNarration}
-          speak={speak}
-          cancel={cancel}
-          showNextButton={showNextButton}
-          isGameOverState={isGameOverState}
-          dailyChallenge={dailyChallenge}
-          offlineMode={offlineMode}
-          
-          onStartSolo={handleStartSolo}
-          onStartMultiplayer={handleStartMultiplayer}
-          onStartMarathon={handleStartMarathon}
-          onStartStudy={handleStartStudy}
-          onStartTournament={handleStartTournament}
-          onStartStory={handleStartStory}
-          onStartCoopEntry={handleStartCoopEntry}
-          onShowRanking={handleShowRanking}
-          onShowAchievements={handleShowAchievements}
-          onShowPowerUpShop={handleShowPowerUpShop}
-          onShowReview={handleStartReview}
-          onShowStats={handleShowStats}
-          onShowProfile={handleShowProfile}
-          onSelectChapter={handleSelectChapter}
-          onEnterCoopLobby={handleEnterCoopLobby}
-          handleCoopGameStart={handleCoopGameStart}
-          handleCancelCoop={handleCancelCoop}
-          handleAnswer={handleAnswer}
-          handleNextQuestion={handleNextQuestion}
-          handleQuitQuiz={handleQuitQuiz}
-          handleContinue={handleContinue}
-          onSetGameMode={setGameMode}
-          handleEndGame={handleEndGame}
-        />
-      </Suspense>
+      {/* Game Screens */}
+      <GameScreens
+        gameMode={gameMode}
+        setupMode={setupMode}
+        quiz={quiz}
+        coop={coop}
+        storyMode={storyMode}
+        playerLevel={playerLevel}
+        reviewHistory={reviewHistory}
+        settings={settings}
+        toggleNarration={toggleNarration}
+        speak={speak}
+        cancel={cancel}
+        showNextButton={showNextButton}
+        isGameOverState={isGameOverState}
+        dailyChallenge={dailyChallenge}
+        offlineMode={offlineMode}
+        
+        onStartSolo={handleStartSolo}
+        onStartMultiplayer={handleStartMultiplayer}
+        onStartMarathon={handleStartMarathon}
+        onStartStudy={handleStartStudy}
+        onStartTournament={handleStartTournament}
+        onStartStory={handleStartStory}
+        onStartCoopEntry={handleStartCoopEntry}
+        onShowRanking={handleShowRanking}
+        onShowAchievements={handleShowAchievements}
+        onShowPowerUpShop={handleShowPowerUpShop}
+        onShowReview={handleStartReview}
+        onShowStats={handleShowStats}
+        onShowProfile={handleShowProfile}
+        onSelectChapter={handleSelectChapter}
+        onEnterCoopLobby={handleEnterCoopLobby}
+        handleCoopGameStart={handleCoopGameStart}
+        handleCancelCoop={handleCancelCoop}
+        handleAnswer={handleAnswer}
+        handleNextQuestion={handleNextQuestion}
+        handleQuitQuiz={handleQuitQuiz}
+        handleContinue={handleContinue}
+        onSetGameMode={setGameMode}
+        handleEndGame={handleEndGame}
+      />
 
       {/* Modals */}
       <PlayerSetup
