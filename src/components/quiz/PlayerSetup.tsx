@@ -16,6 +16,7 @@ interface PlayerSetupProps {
 
 export function PlayerSetup({ open, onClose, onStart, mode }: PlayerSetupProps) {
   const [players, setPlayers] = useState<Array<{ name: string; avatar: string }>>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (open) {
