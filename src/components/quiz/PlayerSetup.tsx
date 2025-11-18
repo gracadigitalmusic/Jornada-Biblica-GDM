@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { AVATARS_SOLO, AVATARS_MULTI } from "@/data/questions";
 import { Player } from "@/types/quiz";
 import { PlusCircle, XCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PlayerSetupProps {
   open: boolean;
