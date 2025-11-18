@@ -119,6 +119,15 @@ export default {
           "0%": { backgroundPosition: "-1000px 0" },
           "100%": { backgroundPosition: "1000px 0" },
         },
+        "shake": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "10%, 30%, 50%, 70%, 90%": { transform: "translateX(-10px)" },
+          "20%, 40%, 60%, 80%": { transform: "translateX(10px)" },
+        },
+        "pulse-scale": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.05)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -128,6 +137,8 @@ export default {
         "orb-pulse": "orb-pulse 3s ease-in-out infinite",
         "fade-in-up": "fade-in-up 0.5s ease-out forwards",
         "shimmer-effect": "shimmer-effect 3s infinite linear",
+        "shake": "shake 0.5s ease-in-out",
+        "pulse-scale": "pulse-scale 0.6s ease-in-out infinite",
       },
     },
   },

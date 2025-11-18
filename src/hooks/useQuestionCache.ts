@@ -6,6 +6,7 @@ import { toast } from '@/hooks/use-toast';
 
 const QUESTION_CACHE_KEY = 'jb_question_cache';
 const LAST_SYNC_KEY = 'jb_last_sync_time';
+const ANSWERED_QUESTIONS_KEY = 'jb_answered_questions';
 
 export function useQuestionCache() {
   const [isReady, setIsReady] = useState(false);
@@ -64,11 +65,48 @@ export function useQuestionCache() {
     }
   }, [isReady]);
 
+  // Cache de perguntas respondidas para análise e review
+  const cacheAnsweredQuestion = useCallback(async (questionId: string, wasCorrect: boolean, timeTaken: number) => {
+    if (!isReady) return;
+    try {
+      const cached = await localforage.getItem(ANSWERED_QUESTIONS_KEY) as any[] || [];
+      const entry = {
+        questionId,
+        wasCorrect,
+        timeTaken,
+        answeredAt: new Date().toISOString(),
+      };
+      cached.push(entry);
+      // Mantém apenas últimas 500 respostas para não sobrecarregar
+      if (cached.length > 500) {
+        cached.shift();
+      }
+      await localforage.setItem(ANSWERED_QUESTIONS_KEY, cached);
+      return true;
+    } catch (error) {
+      console.error('Erro ao salvar pergunta respondida:', error);
+      return false;
+    }
+  }, [isReady]);
+
+  const getAnsweredQuestions = useCallback(async () => {
+    if (!isReady) return [];
+    try {
+      const cached = await localforage.getItem(ANSWERED_QUESTIONS_KEY);
+      return (cached as any[]) || [];
+    } catch (error) {
+      console.error('Erro ao carregar perguntas respondidas:', error);
+      return [];
+    }
+  }, [isReady]);
+
   return {
     isReady,
     lastSyncTime,
     cacheQuestions,
     loadQuestions,
     clearCache,
+    cacheAnsweredQuestion,
+    getAnsweredQuestions,
   };
 }

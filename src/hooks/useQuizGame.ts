@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Question, Player } from '@/types/quiz';
 import { FALLBACK_QUESTIONS, GAME_CONSTANTS } from '@/data/questions';
 
@@ -26,22 +26,37 @@ export function useQuizGame() {
   const [hintUsedOnQuestion, setHintUsedOnQuestion] = useState(false);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
+  // Throttle timer updates para reduzir CPU
+  const throttleTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
     if (isTimerRunning && timeRemaining > 0) {
+      // Throttle: atualiza a cada 100ms mas com controle
       interval = setInterval(() => {
-        setTimeRemaining((prev) => {
-          if (prev <= 0.1) {
-            setIsTimerRunning(false);
-            return 0;
-          }
-          return prev - 0.1;
-        });
+        if (!throttleTimerRef.current) {
+          throttleTimerRef.current = setTimeout(() => {
+            throttleTimerRef.current = null;
+          }, 50);
+          
+          setTimeRemaining((prev) => {
+            if (prev <= 0.1) {
+              setIsTimerRunning(false);
+              return 0;
+            }
+            return prev - 0.1;
+          });
+        }
       }, 100);
     }
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (throttleTimerRef.current) {
+        clearTimeout(throttleTimerRef.current);
+      }
+    };
   }, [isTimerRunning, timeRemaining]);
 
   const initializeGame = useCallback(async (
