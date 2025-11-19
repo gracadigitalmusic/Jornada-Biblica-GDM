@@ -24,7 +24,7 @@ import { throttle } from "lodash-es";
 // Dynamic Imports for Code Splitting
 const LazyGameScreens = lazy(() => import("@/components/quiz/GameScreens").then(mod => ({ default: mod.GameScreens })));
 
-const Index = () => {
+const GameMenu = () => {
   const [gameMode, setGameMode] = useState<GameMode>("menu");
   const [setupMode, setSetupMode] = useState<'solo' | 'multiplayer'>('solo');
   const [showPlayerSetup, setShowPlayerSetup] = useState(false);
@@ -194,13 +194,6 @@ const Index = () => {
   const handleShowStats = () => setShowStats(true);
   const handleShowProfile = () => setShowProfile(true);
 
-  // Removido handlers de CO-OP e Question Submission
-  // const handleStartCoopEntry = () => {}; // Removido
-  // const handleEnterCoopLobby = () => {}; // Removido
-  // const handleCoopGameStart = () => {}; // Removido
-  // const handleCancelCoop = () => {}; // Removido
-  // const handleShowQuestionSubmission = () => {}; // Removido
-
   const handleSelectChapter = (chapterId: string) => {
     storyMode.setCurrentChapter(chapterId);
     const lastUser = localStorage.getItem('jb_last_user');
@@ -354,7 +347,6 @@ const Index = () => {
           onStartStudy={handleStartStudy}
           onStartTournament={handleStartTournament}
           onStartStory={handleStartStory}
-          // onStartCoopEntry={handleStartCoopEntry} // Removido
           onShowRanking={handleShowRanking}
           onShowAchievements={handleShowAchievements}
           onShowPowerUpShop={handleShowPowerUpShop}
@@ -362,9 +354,6 @@ const Index = () => {
           onShowStats={handleShowStats}
           onShowProfile={handleShowProfile}
           onSelectChapter={handleSelectChapter}
-          // onEnterCoopLobby={handleEnterCoopLobby} // Removido
-          // handleCoopGameStart={handleCoopGameStart} // Removido
-          // handleCancelCoop={handleCancelCoop} // Removido
           handleAnswer={handleAnswer}
           handleNextQuestion={handleNextQuestion}
           handleQuitQuiz={handleQuitQuiz}
@@ -372,7 +361,6 @@ const Index = () => {
           onSetGameMode={setGameMode}
           handleEndGame={handleEndGame}
           onStartPersonalizedStudy={handleStartPersonalizedStudy}
-          // onShowQuestionSubmission={handleShowQuestionSubmission} // Removido
           hasStats={hasStats}
         />
       </Suspense>
@@ -396,12 +384,10 @@ const Index = () => {
         setShowStats={setShowStats}
         showProfile={showProfile}
         setShowProfile={setShowProfile}
-        // showQuestionSubmission={false} // Removido
-        // setShowQuestionSubmission={() => {}} // Removido
         onStartSolo={handleStartSolo}
       />
     </div>
   );
 };
 
-export default Index;
+export default GameMenu;
