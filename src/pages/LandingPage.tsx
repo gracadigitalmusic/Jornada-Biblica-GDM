@@ -17,20 +17,19 @@ const itemVariants: Variants = {
 
 export function LandingPage() {
   return (
-    <div className="bg-gradient-to-br from-quiz-bg-start to-quiz-bg-end text-foreground font-poppins overflow-x-hidden">
+    <div className="text-foreground font-poppins overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative h-svh flex flex-col items-center justify-center text-center p-4 overflow-hidden">
-        {/* Background Orbs/Glows - Removendo animações do framer-motion para evitar conflito com CSS */}
-        <div className="absolute inset-0 pointer-events-none">
+        {/* Background Orbs/Glows - Removido para um fundo limpo */}
+        {/* <div className="absolute inset-0 pointer-events-none">
           <motion.div 
             className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-70 animate-float"
-            // A animação 'animate-float' já é definida via CSS em src/index.css
           />
           <motion.div 
             className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-secondary/10 rounded-full blur-3xl opacity-70 animate-float"
-            style={{ animationDelay: "1s" }} // Mantendo o delay da animação CSS
+            style={{ animationDelay: "1s" }}
           />
-        </div>
+        </div> */}
 
         <motion.img
           src="/logo_jogo.png"
@@ -296,7 +295,7 @@ export function LandingPage() {
                 <CardTitle className="text-xl">Desafios Diários</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground text-sm">Nvos desafios todos os dias para testar suas habilidades e ganhar recompensas.</p>
+                <p className="text-muted-foreground text-sm">Novos desafios todos os dias para testar suas habilidades e ganhar recompensas.</p>
               </CardContent>
             </Card>
           </motion.div>
