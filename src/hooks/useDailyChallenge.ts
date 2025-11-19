@@ -16,9 +16,9 @@ interface DailyChallenge {
 }
 
 const CHALLENGE_REWARDS = [
-  { target: 500, coins: 100, item: { id: 'powerup_bundle', name: 'Pacote de Power-ups', description: 'Um pacote com power-ups aleatórios', icon: '🎁', price: 0, type: 'powerup' as const, rarity: 'rare' } },
-  { target: 1000, coins: 250, item: { id: 'effect_holy_light', name: 'Luz Sagrada', description: 'Efeito de luz divina nas respostas corretas', icon: '✨', price: 0, type: 'effect' as const, rarity: 'rare' } },
-  { target: 1500, coins: 300, item: { id: 'avatar_prophet', name: 'Avatar Profeta', description: 'Avatar de um sábio profeta', icon: '🧙', price: 0, type: 'avatar' as const, rarity: 'epic' } },
+  { target: 500, coins: 100, item: { id: 'powerup_bundle', name: 'Pacote de Power-ups', description: 'Um pacote com power-ups aleatórios', icon: '🎁', price: 0, type: 'powerup' as const, rarity: 'rare' as const } },
+  { target: 1000, coins: 250, item: { id: 'effect_holy_light', name: 'Luz Sagrada', description: 'Efeito de luz divina nas respostas corretas', icon: '✨', price: 0, type: 'effect' as const, rarity: 'rare' as const } },
+  { target: 1500, coins: 300, item: { id: 'avatar_prophet', name: 'Avatar Profeta', description: 'Avatar de um sábio profeta', icon: '🧙', price: 0, type: 'avatar' as const, rarity: 'epic' as const } },
 ];
 
 function getTodayDate() {
