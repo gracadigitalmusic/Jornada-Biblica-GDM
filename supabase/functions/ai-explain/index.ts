@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { GoogleGenerativeAI } from 'https://esm.sh/@google/generative-ai@0.15.0';
+import Groq from 'https://esm.sh/groq@0.1.0'; // Importando o cliente Groq
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,17 +22,16 @@ serve(async (req) => {
       });
     }
 
-    const GOOGLE_API_KEY = Deno.env.get('GOOGLE_API_KEY');
+    const GROQ_API_KEY = Deno.env.get('groq_api_key'); // Usando a nova variável de ambiente
 
-    if (!GOOGLE_API_KEY) {
-      return new Response(JSON.stringify({ error: 'GOOGLE_API_KEY not set in Supabase secrets.' }), {
+    if (!GROQ_API_KEY) {
+      return new Response(JSON.stringify({ error: 'groq_api_key not set in Supabase secrets.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       });
     }
 
-    const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Usando Gemini 1.5 Flash
+    const groq = new Groq({ apiKey: GROQ_API_KEY }); // Inicializando o cliente Groq
 
     const prompt = `Você é um especialista em teologia e história bíblica. Sua tarefa é expandir e aprofundar a explicação de uma pergunta bíblica, tornando-a mais rica e contextualizada. Mantenha um tom respeitoso e informativo.
 
@@ -42,9 +41,14 @@ Referência Bíblica: "${reference}"
 
 Por favor, forneça uma explicação aprimorada, com no mínimo 100 palavras, que inclua contexto histórico, teológico ou cultural relevante, e como a passagem se aplica à vida cristã, se apropriado. Não repita a pergunta ou a referência no início da sua resposta, apenas a explicação aprimorada.`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const aiExplanation = response.text();
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "llama3-8b-8192", // Modelo da Groq, você pode ajustar se preferir outro
+      temperature: 0.7,
+      max_tokens: 1024,
+    });
+
+    const aiExplanation = chatCompletion.choices[0]?.message?.content || "Não foi possível gerar uma explicação da IA.";
 
     return new Response(JSON.stringify({ aiExplanation }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
