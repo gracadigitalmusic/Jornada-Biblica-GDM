@@ -205,10 +205,10 @@ export function QuizScreen({
       if (isNarrationEnabled) {
         onNarrate(explanation);
       }
-    } catch (error) {
+    } catch (error: any) { // Captura o erro para exibir a mensagem detalhada
       toast({
         title: "Erro na IA",
-        description: "Não foi possível gerar a explicação aprimorada.",
+        description: error.message || "Não foi possível gerar a explicação aprimorada.",
         variant: "destructive",
       });
     } finally {
