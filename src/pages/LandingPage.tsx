@@ -1,17 +1,18 @@
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion"; // Importando 'Variants' para tipagem explícita
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Users, Zap, Globe, BrainCircuit, Trophy, Award, ShoppingBag, Download, ArrowRight, Lightbulb, Target, Infinity, BookMarked, HeartHandshake, ScrollText, GraduationCap, Crown } from "lucide-react";
 
-const sectionVariants = {
+// Definindo os variants com tipagem explícita e usando arrays para 'ease'
+const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 50 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.42, 0, 0.58, 1] } }, // ease: "easeInOut"
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, scale: 0.8 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" } },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: [0.42, 0, 0.58, 1] } }, // ease: "easeInOut"
 };
 
 export function LandingPage() {
@@ -19,17 +20,15 @@ export function LandingPage() {
     <div className="min-h-screen bg-gradient-to-br from-quiz-bg-start to-quiz-bg-end text-foreground font-poppins overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative h-svh flex flex-col items-center justify-center text-center p-4 overflow-hidden">
-        {/* Background Orbs/Glows */}
+        {/* Background Orbs/Glows - Removendo animações do framer-motion para evitar conflito com CSS */}
         <div className="absolute inset-0 pointer-events-none">
           <motion.div 
             className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-70 animate-float"
-            animate={{ x: [-20, 20, -20], y: [-20, 20, -20] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            // A animação 'animate-float' já é definida via CSS em src/index.css
           />
           <motion.div 
             className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-secondary/10 rounded-full blur-3xl opacity-70 animate-float"
-            animate={{ x: [20, -20, 20], y: [20, -20, 20] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            style={{ animationDelay: "1s" }} // Mantendo o delay da animação CSS
           />
         </div>
 
@@ -39,14 +38,14 @@ export function LandingPage() {
           className="w-48 h-auto mb-6 z-10 animate-logo-pulse"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.8, ease: [0.42, 0, 0.58, 1] }} // ease: "easeInOut"
         />
 
         <motion.h1
           className="text-5xl md:text-7xl font-black tracking-tight mb-4 z-10 text-gradient-primary"
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
+          transition={{ delay: 0.5, duration: 0.8, ease: [0.42, 0, 0.58, 1] }} // ease: "easeInOut"
           style={{ fontFamily: "'Orbitron', sans-serif" }}
         >
           JORNADA BÍBLICA
@@ -55,14 +54,14 @@ export function LandingPage() {
           className="text-xl md:text-2xl text-muted-foreground font-medium mb-8 max-w-2xl z-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.8, ease: "easeOut" }}
+          transition={{ delay: 1, duration: 0.8, ease: [0.42, 0, 0.58, 1] }} // ease: "easeInOut"
         >
           Desvende as Escrituras, Desafie sua Mente, Fortaleça sua Fé.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1.5, duration: 0.6, ease: "easeOut" }}
+          transition={{ delay: 1.5, duration: 0.6, ease: [0.42, 0, 0.58, 1] }} // ease: "easeInOut"
           className="z-10"
         >
           <Link to="/game">
@@ -319,7 +318,7 @@ export function LandingPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
+          transition={{ delay: 0.5, duration: 0.6, ease: [0.42, 0, 0.58, 1] }} // ease: "easeInOut"
         >
           <Link to="/game">
             <Button size="lg" className="px-12 py-7 text-2xl font-bold bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-xl animate-pulse-glow-primary">
