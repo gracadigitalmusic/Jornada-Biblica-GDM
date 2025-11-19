@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Trophy, Users, User, Zap, Award, Volume2, VolumeX, TrendingUp, ShoppingBag, Network, Infinity, Globe, Database, Target, Crown, BookOpen, BookMarked, Settings, LucideProps, Download, Sparkles, Heart, Shield, Lightbulb, BrainCircuit, MessageSquarePlus } from "lucide-react";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
-// Removido: import { useStats } from "@/hooks/useStats"; // Não é mais necessário aqui para a condição
+import { MainMenuHeader } from "./MainMenuHeader"; // Importando o novo componente
 
 interface MenuScreenProps {
   onStartSolo: () => void;
@@ -180,24 +180,12 @@ export function MenuScreen(props: MenuScreenProps) {
         />
       </div>
 
-      {/* Top Bar & Title */}
-      <div className="flex flex-col items-center justify-start mb-8 relative z-10">
-        {/* Botões de Configuração */}
-        <div className="absolute top-4 right-4 flex items-center gap-2">
-          <Button onClick={props.onShowProfile} variant="ghost" size="icon" className="text-primary hover:bg-primary/10">
-            <User className="w-5 h-5" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={props.onToggleNarration}>
-            {props.isNarrationEnabled ? <Volume2 className="w-5 h-5 text-secondary" /> : <VolumeX className="w-5 h-5 text-muted-foreground" />}
-          </Button>
-        </div>
-
-        {/* Título do Jogo */}
-        <h1 className="text-4xl md:text-6xl font-black mt-4 tracking-tight" style={{ fontFamily: "'Orbitron', sans-serif" }}>
-          <span className="text-gradient-primary">JORNADA</span><br /><span className="text-gradient-secondary">BÍBLICA</span>
-        </h1>
-        <p className="text-base md:text-lg text-muted-foreground font-medium mt-2">Teste seu conhecimento das Escrituras</p>
-      </div>
+      {/* Novo Cabeçalho */}
+      <MainMenuHeader
+        isNarrationEnabled={props.isNarrationEnabled}
+        onToggleNarration={props.onToggleNarration}
+        onShowProfile={props.onShowProfile}
+      />
       
       {/* Botão de Download Offline em Destaque */}
       {!props.isOfflineDataCached && (
