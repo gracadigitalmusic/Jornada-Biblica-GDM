@@ -170,7 +170,7 @@ export function MenuScreen(props: MenuScreenProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="flex flex-col items-center justify-start text-center space-y-8 relative max-w-6xl mx-auto pb-8 px-4"
+      className="flex flex-col items-center justify-start text-center space-y-4 relative max-w-6xl mx-auto pt-4 pb-4 px-4"
     >
       {/* Watermark Background */}
       <div className="absolute inset-0 z-0 pointer-events-none">
