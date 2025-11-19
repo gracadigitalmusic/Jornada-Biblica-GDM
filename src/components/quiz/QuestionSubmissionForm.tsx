@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, Trash2, Send, Loader2, Check, Circle } from 'lucide-react'; // Importado Check e Circle
+import { PlusCircle, Trash2, Send, Loader2, Check, Circle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Question } from '@/types/quiz';
@@ -14,7 +14,7 @@ interface QuestionSubmissionFormProps {
   onClose: () => void;
 }
 
-export function QuestionSubmissionForm({ onClose }: QuestionSubmissionFormFormProps) {
+export function QuestionSubmissionForm({ onClose }: QuestionSubmissionFormProps) {
   const { toast } = useToast();
   const [questionText, setQuestionText] = useState('');
   const [options, setOptions] = useState<string[]>(['', '', '', '']);
@@ -75,8 +75,8 @@ export function QuestionSubmissionForm({ onClose }: QuestionSubmissionFormFormPr
     }
 
     try {
-      const { error } = await supabase
-        .from('community_questions') // Corrigido para usar a tabela community_questions
+      const { data, error } = await supabase
+        .from('community_questions')
         .insert({
           user_id: user.data.user.id,
           question: questionText.trim(),
@@ -86,15 +86,33 @@ export function QuestionSubmissionForm({ onClose }: QuestionSubmissionFormFormPr
           explanation: explanation.trim() || null,
           category: category.trim(),
           difficulty: difficulty,
-          status: 'pending',
-        });
+          status: 'pending', // Status inicial é 'pending'
+        })
+        .select('id') // Seleciona o ID da pergunta inserida
+        .single();
 
       if (error) throw error;
 
-      toast({
-        title: "Pergunta Submetida! 🎉",
-        description: "Sua pergunta foi enviada para revisão. Agradecemos sua contribuição!",
+      const newQuestionId = data.id;
+
+      // Invocar a Edge Function para revisão da IA
+      const { error: aiError } = await supabase.functions.invoke('ai-review-question', {
+        body: { questionId: newQuestionId },
       });
+
+      if (aiError) {
+        console.error("Erro ao invocar Edge Function de revisão da IA:", aiError);
+        toast({
+          title: "Erro na Revisão da IA",
+          description: "A pergunta foi submetida, mas houve um erro ao iniciar a revisão da IA. Um administrador irá verificar.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Pergunta Submetida! 🎉",
+          description: "Sua pergunta foi enviada para revisão. Agradecemos sua contribuição!",
+        });
+      }
       onClose();
     } catch (error: any) {
       console.error("Erro ao submeter pergunta:", error);
