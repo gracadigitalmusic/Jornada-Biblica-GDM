@@ -195,11 +195,11 @@ const Index = () => {
   const handleShowProfile = () => setShowProfile(true);
 
   // Removido handlers de CO-OP e Question Submission
-  const handleStartCoopEntry = () => {};
-  const handleEnterCoopLobby = () => {};
-  const handleCoopGameStart = () => {};
-  const handleCancelCoop = () => {};
-  const handleShowQuestionSubmission = () => {}; // Removido a funcionalidade, mas mantido o handler vazio para evitar erros de referência
+  // const handleStartCoopEntry = () => {}; // Removido
+  // const handleEnterCoopLobby = () => {}; // Removido
+  // const handleCoopGameStart = () => {}; // Removido
+  // const handleCancelCoop = () => {}; // Removido
+  // const handleShowQuestionSubmission = () => {}; // Removido
 
   const handleSelectChapter = (chapterId: string) => {
     storyMode.setCurrentChapter(chapterId);
@@ -354,7 +354,7 @@ const Index = () => {
           onStartStudy={handleStartStudy}
           onStartTournament={handleStartTournament}
           onStartStory={handleStartStory}
-          onStartCoopEntry={handleStartCoopEntry}
+          // onStartCoopEntry={handleStartCoopEntry} // Removido
           onShowRanking={handleShowRanking}
           onShowAchievements={handleShowAchievements}
           onShowPowerUpShop={handleShowPowerUpShop}
@@ -362,9 +362,9 @@ const Index = () => {
           onShowStats={handleShowStats}
           onShowProfile={handleShowProfile}
           onSelectChapter={handleSelectChapter}
-          onEnterCoopLobby={handleEnterCoopLobby}
-          handleCoopGameStart={handleCoopGameStart}
-          handleCancelCoop={handleCancelCoop}
+          // onEnterCoopLobby={handleEnterCoopLobby} // Removido
+          // handleCoopGameStart={handleCoopGameStart} // Removido
+          // handleCancelCoop={handleCancelCoop} // Removido
           handleAnswer={handleAnswer}
           handleNextQuestion={handleNextQuestion}
           handleQuitQuiz={handleQuitQuiz}
@@ -372,7 +372,7 @@ const Index = () => {
           onSetGameMode={setGameMode}
           handleEndGame={handleEndGame}
           onStartPersonalizedStudy={handleStartPersonalizedStudy}
-          onShowQuestionSubmission={handleShowQuestionSubmission}
+          // onShowQuestionSubmission={handleShowQuestionSubmission} // Removido
           hasStats={hasStats}
         />
       </Suspense>
@@ -396,8 +396,8 @@ const Index = () => {
         setShowStats={setShowStats}
         showProfile={showProfile}
         setShowProfile={setShowProfile}
-        showQuestionSubmission={false} // Sempre false agora
-        setShowQuestionSubmission={() => {}} // Função vazia
+        // showQuestionSubmission={false} // Removido
+        // setShowQuestionSubmission={() => {}} // Removido
         onStartSolo={handleStartSolo}
       />
     </div>

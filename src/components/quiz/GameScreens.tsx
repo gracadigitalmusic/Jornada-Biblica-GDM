@@ -18,7 +18,7 @@ import { useOfflineMode } from "@/hooks/useOfflineMode"; // Importando o hook
 
 interface GameScreensProps {
   gameMode: GameMode;
-  setupMode: 'solo' | 'multiplayer'; // Removido 'coop'
+  setupMode: 'solo' | 'multiplayer';
   quiz: ReturnType<typeof useQuizGame>;
   storyMode: ReturnType<typeof useStoryMode>;
   playerLevel: ReturnType<typeof usePlayerLevel>;
