@@ -18,10 +18,10 @@ import { useOfflineMode } from "@/hooks/useOfflineMode";
 import { useAdaptiveQuestions } from "@/hooks/useAdaptiveQuestions";
 import { Player, GameMode, Question } from "@/types/quiz";
 import { GAME_CONSTANTS, FALLBACK_QUESTIONS } from "@/data/questions"; // Importar FALLBACK_QUESTIONS
-import { Loader2, Upload } from "lucide-react"; // Importar Upload
+import { Loader2 } from "lucide-react"; // Remover Upload, pois não será mais usado
 import { throttle } from "lodash-es";
 import { supabase } from "@/integrations/supabase/client"; // Importar Supabase client
-import { Button } from "@/components/ui/button"; // Importar Button
+// import { Button } from "@/components/ui/button"; // Remover importação de Button se não for mais usada aqui
 
 // Dynamic Imports for Code Splitting
 const LazyGameScreens = lazy(() => import("@/components/quiz/GameScreens").then(mod => ({ default: mod.GameScreens })));
@@ -38,7 +38,7 @@ const GameMenu = () => {
   const [showNextButton, setShowNextButton] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [isMigratingQuestions, setIsMigratingQuestions] = useState(false); // Novo estado
+  // const [isMigratingQuestions, setIsMigratingQuestions] = useState(false); // Remover estado
 
   const quiz = useQuizGame();
   const achievements = useAchievements();
@@ -324,34 +324,7 @@ const GameMenu = () => {
   };
 
   // --- TEMPORARY MIGRATION FUNCTION ---
-  const migrateQuestionsToSupabase = async () => {
-    if (isMigratingQuestions) return;
-    setIsMigratingQuestions(true);
-    try {
-      // Primeiro, verificar se já existem perguntas no Supabase para evitar duplicatas
-      const { count } = await supabase.from('questions').select('*', { count: 'exact' });
-      if (count && count > 0) {
-        alert('Perguntas já existem no Supabase. Migração cancelada para evitar duplicatas.');
-        setIsMigratingQuestions(false);
-        return;
-      }
-
-      const { error } = await supabase.from('questions').insert(FALLBACK_QUESTIONS);
-      if (error) {
-        console.error('Erro ao migrar perguntas:', error);
-        alert('Erro ao migrar perguntas para o Supabase. Verifique o console.');
-      } else {
-        alert('Todas as perguntas foram migradas com sucesso para o Supabase! Por favor, recarregue a página.');
-        // Opcional: recarregar a página para garantir que o novo banco seja usado
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error('Erro inesperado na migração:', error);
-      alert('Erro inesperado na migração. Verifique o console.');
-    } finally {
-      setIsMigratingQuestions(false);
-    }
-  };
+  // Esta função e o botão associado foram removidos, pois a migração inicial foi concluída.
   // --- END TEMPORARY MIGRATION FUNCTION ---
 
   return (
@@ -363,8 +336,8 @@ const GameMenu = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
       </div>
 
-      {/* Botão de Migração Temporário */}
-      {gameMode === "menu" && (
+      {/* Botão de Migração Temporário - REMOVIDO */}
+      {/* {gameMode === "menu" && (
         <div className="absolute top-4 left-4 z-50">
           <Button 
             onClick={migrateQuestionsToSupabase} 
@@ -384,7 +357,7 @@ const GameMenu = () => {
             )}
           </Button>
         </div>
-      )}
+      )} */}
 
       {/* Game Screens (Lazy Loaded) */}
       <Suspense fallback={
