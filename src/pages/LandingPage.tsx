@@ -17,7 +17,7 @@ const itemVariants: Variants = {
 
 export function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-quiz-bg-start to-quiz-bg-end text-foreground font-poppins overflow-x-hidden">
+    <div className="bg-gradient-to-br from-quiz-bg-start to-quiz-bg-end text-foreground font-poppins overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative h-svh flex flex-col items-center justify-center text-center p-4 overflow-hidden">
         {/* Background Orbs/Glows - Removendo animações do framer-motion para evitar conflito com CSS */}
@@ -296,7 +296,7 @@ export function LandingPage() {
                 <CardTitle className="text-xl">Desafios Diários</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground text-sm">Novos desafios todos os dias para testar suas habilidades e ganhar recompensas.</p>
+                <p className="text-muted-foreground text-sm">Nvos desafios todos os dias para testar suas habilidades e ganhar recompensas.</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -318,7 +318,7 @@ export function LandingPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5, duration: 0.6, ease: [0.42, 0, 0.58, 1] }} // ease: "easeInOut"
+          transition={{ delay: 0.5, duration: 0.6, ease: [0.42, 0, 0.58, 1] }}
         >
           <Link to="/game">
             <Button size="lg" className="px-12 py-7 text-2xl font-bold bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-xl animate-pulse-glow-primary">
