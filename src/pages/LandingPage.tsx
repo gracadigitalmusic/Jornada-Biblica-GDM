@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Users, Zap, Globe, BrainCircuit, Trophy, Award, ShoppingBag, Download, ArrowRight, Lightbulb, Target, Infinity, BookMarked, HeartHandshake, ScrollText, GraduationCap, Crown, BarChart3 } from "lucide-react";
 
 // Importando os novos componentes
-import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
+// import { TestimonialsSection } from "@/components/landing/TestimonialsSection"; // Removido
 import { MiniQuizSection } from "@/components/landing/MiniQuizSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 // FloatingCTA foi removido
@@ -65,7 +65,8 @@ export function LandingPage() {
           </Link>
         </motion.div>
 
-        {/* Placeholder para Estatísticas Dinâmicas */}
+        {/* Placeholder para Estatísticas Dinâmicas - REMOVIDO */}
+        {/*
         <motion.div
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-8 text-lg font-semibold text-muted-foreground z-10"
           initial={{ opacity: 0, y: 20 }}
@@ -85,6 +86,7 @@ export function LandingPage() {
             <span>+5000 Sessões Concluídas</span>
           </div>
         </motion.div>
+        */}
       </section>
 
       {/* About Section */}
@@ -221,8 +223,8 @@ export function LandingPage() {
       {/* Mini Quiz Section */}
       <MiniQuizSection />
 
-      {/* Testimonials Section */}
-      <TestimonialsSection />
+      {/* Testimonials Section - REMOVIDO */}
+      {/* <TestimonialsSection /> */}
 
       {/* Features Section */}
       <motion.section
