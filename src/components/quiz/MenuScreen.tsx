@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Trophy, Users, User, Zap, Award, Volume2, VolumeX, TrendingUp, ShoppingBag, Network, Infinity, Globe, Database, Target, Crown, BookOpen, BookMarked, Settings, LucideProps, Download, Sparkles, Heart, Shield, Lightbulb } from "lucide-react";
+import { Trophy, Users, User, Zap, Award, Volume2, VolumeX, TrendingUp, ShoppingBag, Network, Infinity, Globe, Database, Target, Crown, BookOpen, BookMarked, Settings, LucideProps, Download, Sparkles, Heart, Shield, Lightbulb, BrainCircuit, MessageSquarePlus } from "lucide-react";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
+import { useStats } from "@/hooks/useStats";
 
 interface MenuScreenProps {
   onStartSolo: () => void;
@@ -25,6 +26,8 @@ interface MenuScreenProps {
   onClaimReward: () => void;
   isOfflineDataCached: boolean;
   onDownloadOffline: () => void;
+  onStartPersonalizedStudy: () => void;
+  onShowQuestionSubmission: () => void; // Novo handler
 }
 
 interface GameModeDefinition {
@@ -106,6 +109,20 @@ const LEARNING_MODES: GameModeDefinition[] = [
     glow: 'glow-secondary',
     condition: (props: MenuScreenProps) => props.isReviewAvailable
   },
+  {
+    id: 'personalized_study',
+    title: "Estudo Personalizado",
+    subtitle: "Focado nas suas dificuldades",
+    icon: BrainCircuit,
+    onClick: (props: MenuScreenProps) => props.onStartPersonalizedStudy(),
+    color: 'purple',
+    glow: 'glow-primary',
+    condition: (props: MenuScreenProps) => {
+      const { getCategoryPerformance, getDifficultyPerformance } = useStats();
+      const hasStats = getCategoryPerformance().some(c => c.total > 0) || getDifficultyPerformance().some(d => d.total > 0);
+      return hasStats;
+    }
+  }
 ];
 
 interface ModeButtonProps {
@@ -235,7 +252,7 @@ export function MenuScreen(props: MenuScreenProps) {
       >
         <h3 className="text-lg font-bold mb-4 text-muted-foreground flex items-center justify-center gap-2">
           <Sparkles className="w-5 h-5 text-celestial-gold" />
-          Progresso & Loja
+          Progresso & Comunidade
         </h3>
         <div className="flex flex-wrap justify-center gap-4">
           <Button onClick={props.onShowProfile} variant="outline" size="lg" className="gap-2">
@@ -252,6 +269,9 @@ export function MenuScreen(props: MenuScreenProps) {
           </Button>
           <Button onClick={props.onShowPowerUpShop} variant="outline" size="lg" className="gap-2">
             <ShoppingBag className="w-4 h-4 text-destructive" />Loja
+          </Button>
+          <Button onClick={props.onShowQuestionSubmission} variant="outline" size="lg" className="gap-2">
+            <MessageSquarePlus className="w-4 h-4 text-purple-500" />Submeter Pergunta
           </Button>
         </div>
       </motion.div>

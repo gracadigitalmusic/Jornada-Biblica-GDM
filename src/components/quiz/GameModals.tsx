@@ -6,6 +6,8 @@ import { useVirtualShop } from "@/hooks/useVirtualShop";
 import { useDailyChallenge } from "@/hooks/useDailyChallenge";
 import { useCelebration } from "@/hooks/useCelebration";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent } from '@/components/ui/dialog'; // Importar Dialog e DialogContent
+import { QuestionSubmissionForm } from './QuestionSubmissionForm'; // Importar o novo componente
 
 // Lazy imports for heavy modals
 const LazyRankingModal = React.lazy(() => import("@/components/quiz/RankingModal").then(mod => ({ default: mod.RankingModal })));
@@ -26,6 +28,8 @@ interface GameModalsProps {
   setShowStats: (show: boolean) => void;
   showProfile: boolean;
   setShowProfile: (show: boolean) => void;
+  showQuestionSubmission: boolean; // Novo prop
+  setShowQuestionSubmission: (show: boolean) => void; // Novo prop
   onStartSolo: () => void;
 }
 
@@ -40,6 +44,8 @@ export function GameModals({
   setShowStats,
   showProfile,
   setShowProfile,
+  showQuestionSubmission, // Novo prop
+  setShowQuestionSubmission, // Novo prop
   onStartSolo,
 }: GameModalsProps) {
   const ranking = useRanking();
@@ -107,6 +113,14 @@ export function GameModals({
           onStartChallenge={onStartSolo}
           onClaimReward={handleClaimDailyReward}
         />
+      )}
+
+      {showQuestionSubmission && (
+        <Dialog open={showQuestionSubmission} onOpenChange={setShowQuestionSubmission}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <QuestionSubmissionForm onClose={() => setShowQuestionSubmission(false)} />
+          </DialogContent>
+        </Dialog>
       )}
     </Suspense>
   );

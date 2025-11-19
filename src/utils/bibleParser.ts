@@ -78,6 +78,40 @@ export async function fetchBibleText(reference: string): Promise<string> {
 }
 
 /**
+ * Busca uma explicação aprimorada por IA para uma pergunta.
+ */
+export async function fetchAIExplanation(question: string, originalExplanation: string, reference: string): Promise<string> {
+  try {
+    const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+    const EDGE_FUNCTION_NAME = 'ai-explain'; // Nome da sua Edge Function
+    
+    // Construa a URL completa da Edge Function
+    const functionUrl = `${SUPABASE_URL}/functions/v1/${EDGE_FUNCTION_NAME}`;
+
+    const response = await fetch(functionUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Adicione a chave anon aqui se a função não for protegida por RLS
+        // 'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify({ question, originalExplanation, reference }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `Edge Function error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.aiExplanation;
+  } catch (error) {
+    console.error('Erro ao buscar explicação da IA:', error);
+    return 'Não foi possível gerar uma explicação aprimorada no momento. Tente novamente mais tarde.';
+  }
+}
+
+/**
  * Formata uma referência bíblica para exibição
  */
 export function formatBibleReference(reference: string): string {

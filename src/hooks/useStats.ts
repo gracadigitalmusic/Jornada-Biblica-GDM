@@ -2,9 +2,15 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import { Question } from '@/types/quiz';
 
+interface DifficultyStats {
+  total: number;
+  correct: number;
+}
+
 interface CategoryStats {
   total: number;
   correct: number;
+  difficulties: Record<Question['difficulty'], DifficultyStats>;
 }
 
 interface PerformanceHistory {
@@ -31,19 +37,31 @@ export function useStats() {
   const logAnswer = useCallback((question: Question, correct: boolean, timeSpent: number) => {
     setStats(prev => {
       const category = question.category;
+      const difficulty = question.difficulty;
       const newStats = { ...prev };
 
       // 1. Atualizar estatísticas por categoria
       if (!newStats.categories[category]) {
-        newStats.categories[category] = { total: 0, correct: 0 };
+        newStats.categories[category] = { total: 0, correct: 0, difficulties: {
+          junior: { total: 0, correct: 0 },
+          easy: { total: 0, correct: 0 },
+          medium: { total: 0, correct: 0 },
+          hard: { total: 0, correct: 0 },
+        }};
       }
       newStats.categories[category].total++;
       if (correct) {
         newStats.categories[category].correct++;
       }
 
-      // 2. Adicionar ao histórico (se for o fim de uma sessão, isso será feito separadamente)
-      // Aqui, apenas registramos a resposta individual para o cálculo de categoria.
+      // 2. Atualizar estatísticas por dificuldade dentro da categoria
+      if (!newStats.categories[category].difficulties[difficulty]) {
+        newStats.categories[category].difficulties[difficulty] = { total: 0, correct: 0 };
+      }
+      newStats.categories[category].difficulties[difficulty].total++;
+      if (correct) {
+        newStats.categories[category].difficulties[difficulty].correct++;
+      }
 
       return newStats;
     });
@@ -80,10 +98,39 @@ export function useStats() {
     })).sort((a, b) => b.total - a.total);
   }, [stats.categories]);
 
+  const getDifficultyPerformance = useCallback((category?: string) => {
+    const allDifficulties: Record<Question['difficulty'], DifficultyStats> = {
+      junior: { total: 0, correct: 0 },
+      easy: { total: 0, correct: 0 },
+      medium: { total: 0, correct: 0 },
+      hard: { total: 0, correct: 0 },
+    };
+
+    if (category && stats.categories[category]) {
+      Object.assign(allDifficulties, stats.categories[category].difficulties);
+    } else {
+      // Aggregate across all categories if no specific category is provided
+      Object.values(stats.categories).forEach(catStats => {
+        Object.entries(catStats.difficulties).forEach(([diff, diffStats]) => {
+          allDifficulties[diff as Question['difficulty']].total += diffStats.total;
+          allDifficulties[diff as Question['difficulty']].correct += diffStats.correct;
+        });
+      });
+    }
+
+    return Object.entries(allDifficulties).map(([difficulty, data]) => ({
+      difficulty: difficulty.toUpperCase(),
+      total: data.total,
+      correct: data.correct,
+      percentage: data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0,
+    })).sort((a, b) => b.total - a.total);
+  }, [stats.categories]);
+
   return {
     stats,
     logAnswer,
     logSession,
     getCategoryPerformance,
+    getDifficultyPerformance,
   };
 }

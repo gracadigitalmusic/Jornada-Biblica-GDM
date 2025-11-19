@@ -2,14 +2,15 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Heart, Lightbulb, Zap, Share2, Copy, Volume2 } from "lucide-react";
+import { Heart, Lightbulb, Zap, Share2, Copy, Volume2, Brain } from "lucide-react";
 import { Question, Player } from "@/types/quiz";
-import { GAME_CONSTANTS } from "@/data/questions";
+import { GAME_CONSTants } from "@/data/questions";
 import { useGameSounds } from "@/hooks/useGameSounds";
 import { useBibleReference } from "@/hooks/useBibleReference";
 import { BibleReferenceDialog } from "./BibleReferenceDialog";
 import { useToast } from "@/hooks/use-toast";
 import { useCelebration } from "@/hooks/useCelebration";
+import { fetchAIExplanation } from "@/utils/bibleParser"; // Importar a nova função
 
 interface QuizScreenProps {
   question: Question;
@@ -59,6 +60,8 @@ export function QuizScreen({
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackType, setFeedbackType] = useState<'correct' | 'wrong' | null>(null);
   const [showBibleDialog, setShowBibleDialog] = useState(false);
+  const [aiExplanation, setAiExplanation] = useState<string | null>(null);
+  const [isGeneratingAIExplanation, setIsGeneratingAIExplanation] = useState(false);
 
   const currentPlayer = players[currentPlayerIndex];
   const timePercent = (timeRemaining / GAME_CONSTANTS.TIME_PER_QUESTION) * 100;
@@ -70,6 +73,8 @@ export function QuizScreen({
     setDisabledIndices([]);
     setShowFeedback(false);
     setFeedbackType(null);
+    setAiExplanation(null); // Reset AI explanation
+    setIsGeneratingAIExplanation(false); // Reset AI generation status
   }, [questionIndex]);
 
   useEffect(() => {
@@ -130,7 +135,8 @@ export function QuizScreen({
 
   const handleShareResult = async () => {
     const correctAnswer = question.options[question.answer];
-    const shareText = `📖 Jornada Bíblica\n\nPergunta: ${question.question}\n\n✅ Resposta: ${correctAnswer}\n\n📚 Referência: ${question.reference}\n\n💡 ${question.explanation}`;
+    const explanationText = aiExplanation || question.explanation;
+    const shareText = `📖 Jornada Bíblica\n\nPergunta: ${question.question}\n\n✅ Resposta: ${correctAnswer}\n\n📚 Referência: ${question.reference}\n\n💡 ${explanationText}`;
     
     try {
       if (navigator.share) {
@@ -152,7 +158,8 @@ export function QuizScreen({
 
   const handleCopyToClipboard = async () => {
     const correctAnswer = question.options[question.answer];
-    const shareText = `📖 Jornada Bíblica\n\nPergunta: ${question.question}\n\n✅ Resposta: ${correctAnswer}\n\n📚 Referência: ${question.reference}\n\n💡 ${question.explanation}`;
+    const explanationText = aiExplanation || question.explanation;
+    const shareText = `📖 Jornada Bíblica\n\nPergunta: ${question.question}\n\n✅ Resposta: ${correctAnswer}\n\n📚 Referência: ${question.reference}\n\n💡 ${explanationText}`;
     
     try {
       await navigator.clipboard.writeText(shareText);
@@ -183,9 +190,29 @@ export function QuizScreen({
   };
 
   const handleNarrateExplanation = () => {
-    if (question.explanation) {
-      const narrateText = `${question.reference}. ${question.explanation}`;
+    const textToNarrate = aiExplanation || question.explanation;
+    if (textToNarrate) {
+      const narrateText = `${question.reference}. ${textToNarrate}`;
       onNarrate(narrateText);
+    }
+  };
+
+  const handleGenerateAIExplanation = async () => {
+    setIsGeneratingAIExplanation(true);
+    try {
+      const explanation = await fetchAIExplanation(question.question, question.explanation, question.reference);
+      setAiExplanation(explanation);
+      if (isNarrationEnabled) {
+        onNarrate(explanation);
+      }
+    } catch (error) {
+      toast({
+        title: "Erro na IA",
+        description: "Não foi possível gerar a explicação aprimorada.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingAIExplanation(false);
     }
   };
 
@@ -364,10 +391,10 @@ export function QuizScreen({
               <p className="font-bold text-foreground underline decoration-primary/30">{question.reference}</p>
             </div>
             
-            {question.explanation && (
-              <div className="p-4 bg-muted/50 rounded-lg border border-border">
-                <div className="flex items-start justify-between mb-2">
-                  <p className="text-xs font-semibold text-muted-foreground">💡 Explicação</p>
+            <div className="p-4 bg-muted/50 rounded-lg border border-border">
+              <div className="flex items-start justify-between mb-2">
+                <p className="text-xs font-semibold text-muted-foreground">💡 Explicação</p>
+                <div className="flex gap-2">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -377,10 +404,26 @@ export function QuizScreen({
                     <Volume2 className="w-4 h-4" />
                     Ouvir
                   </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleGenerateAIExplanation}
+                    disabled={isGeneratingAIExplanation}
+                    className="h-8 gap-2"
+                  >
+                    {isGeneratingAIExplanation ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Brain className="w-4 h-4" />
+                    )}
+                    IA
+                  </Button>
                 </div>
-                <p className="text-sm text-foreground leading-relaxed">{question.explanation}</p>
               </div>
-            )}
+              <p className="text-sm text-foreground leading-relaxed">
+                {aiExplanation || question.explanation}
+              </p>
+            </div>
 
             {/* Share Buttons */}
             <div className="flex gap-2">

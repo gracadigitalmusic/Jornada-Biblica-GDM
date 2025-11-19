@@ -15,7 +15,8 @@ import { useVirtualShop } from "@/hooks/useVirtualShop";
 import { useStats } from "@/hooks/useStats";
 import { useDailyChallenge } from "@/hooks/useDailyChallenge";
 import { useOfflineMode } from "@/hooks/useOfflineMode";
-import { Player, GameMode } from "@/types/quiz";
+import { useAdaptiveQuestions } from "@/hooks/useAdaptiveQuestions";
+import { Player, GameMode, Question } from "@/types/quiz";
 import { GAME_CONSTANTS } from "@/data/questions";
 import { Loader2 } from "lucide-react";
 import { throttle } from "lodash-es";
@@ -35,6 +36,7 @@ const Index = () => {
   const [showNextButton, setShowNextButton] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showQuestionSubmission, setShowQuestionSubmission] = useState(false); // Novo estado
 
   const quiz = useQuizGame();
   const achievements = useAchievements();
@@ -49,6 +51,7 @@ const Index = () => {
   const stats = useStats();
   const dailyChallenge = useDailyChallenge();
   const offlineMode = useOfflineMode();
+  const adaptiveQuestions = useAdaptiveQuestions();
 
   useEffect(() => {
     const handleResize = throttle(() => {
@@ -187,6 +190,7 @@ const Index = () => {
   const handleShowPowerUpShop = () => setShowPowerUpShop(true);
   const handleShowStats = () => setShowStats(true);
   const handleShowProfile = () => setShowProfile(true);
+  const handleShowQuestionSubmission = () => setShowQuestionSubmission(true); // Novo handler
 
   // Removido handlers de CO-OP
   const handleStartCoopEntry = () => {};
@@ -201,6 +205,24 @@ const Index = () => {
     
     // Inicia o modo história como um jogo solo de 10 perguntas
     handlePlayersReady([hostPlayer]);
+  };
+
+  const handleStartPersonalizedStudy = async () => {
+    setSetupMode('solo');
+    const lastUser = localStorage.getItem('jb_last_user');
+    const player = lastUser ? JSON.parse(lastUser) : { name: 'Estudioso', location: 'Estudo Personalizado', score: 0, avatar: '🧠' };
+    
+    const personalizedQuestions: Question[] = adaptiveQuestions.getPersonalizedQuestions(10); // 10 perguntas personalizadas
+    
+    const firstQuestionText = await quiz.initializeGame([player], personalizedQuestions.length, async () => personalizedQuestions);
+    setGameMode("quiz");
+    achievements.unlock('start');
+    setShowResults(false);
+    setIsGameOverState(false);
+    setShowNextButton(false);
+    if (settings.isNarrationEnabled && firstQuestionText) {
+      setTimeout(() => speak(firstQuestionText), 500);
+    }
   };
 
   const handlePlayersReady = async (players: Player[]) => {
@@ -339,6 +361,8 @@ const Index = () => {
           handleContinue={handleContinue}
           onSetGameMode={setGameMode}
           handleEndGame={handleEndGame}
+          onStartPersonalizedStudy={handleStartPersonalizedStudy}
+          onShowQuestionSubmission={handleShowQuestionSubmission} // Passar o novo handler
         />
       </Suspense>
 
@@ -361,6 +385,8 @@ const Index = () => {
         setShowStats={setShowStats}
         showProfile={showProfile}
         setShowProfile={setShowProfile}
+        showQuestionSubmission={showQuestionSubmission} // Passar o estado
+        setShowQuestionSubmission={setShowQuestionSubmission} // Passar o setter
         onStartSolo={handleStartSolo}
       />
     </div>
