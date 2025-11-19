@@ -1,8 +1,14 @@
-import { motion, Variants } from "framer-motion"; // Importando 'Variants' para tipagem explícita
+import { motion, Variants } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Users, Zap, Globe, BrainCircuit, Trophy, Award, ShoppingBag, Download, ArrowRight, Lightbulb, Target, Infinity, BookMarked, HeartHandshake, ScrollText, GraduationCap, Crown } from "lucide-react";
+import { BookOpen, Users, Zap, Globe, BrainCircuit, Trophy, Award, ShoppingBag, Download, ArrowRight, Lightbulb, Target, Infinity, BookMarked, HeartHandshake, ScrollText, GraduationCap, Crown, PlayCircle, BarChart3 } from "lucide-react";
+
+// Importando os novos componentes
+import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
+import { MiniQuizSection } from "@/components/landing/MiniQuizSection";
+import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
+import { FloatingCTA } from "@/components/landing/FloatingCTA";
 
 // Definindo os variants com tipagem explícita e usando arrays para 'ease'
 const sectionVariants: Variants = {
@@ -19,7 +25,7 @@ export function LandingPage() {
   return (
     <div className="text-foreground font-poppins overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative h-svh flex flex-col items-center justify-center text-center p-4 overflow-hidden">
+      <section className="relative h-svh flex flex-col items-center justify-center text-center p-4 overflow-hidden bg-gradient-to-br from-quiz-bg-start to-quiz-bg-end">
         {/* Background Orbs/Glows - Removido para um fundo limpo */}
         {/* <div className="absolute inset-0 pointer-events-none">
           <motion.div 
@@ -69,7 +75,53 @@ export function LandingPage() {
             </Button>
           </Link>
         </motion.div>
+
+        {/* Placeholder para Estatísticas Dinâmicas */}
+        <motion.div
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-8 text-lg font-semibold text-muted-foreground z-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.8, duration: 0.6, ease: [0.42, 0, 0.58, 1] }}
+        >
+          <div className="flex items-center gap-2">
+            <BookMarked className="w-5 h-5 text-primary" />
+            <span>+500 Perguntas Únicas</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-secondary" />
+            <span>+1000 Jogadores Ativos</span>
+          </div>
+        </motion.div>
       </section>
+
+      {/* Video Section */}
+      <motion.section
+        className="py-20 px-4 max-w-6xl mx-auto text-center"
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
+        <h2 className="text-4xl font-bold text-gradient-secondary mb-6">Veja a Jornada em Ação!</h2>
+        <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-12">
+          Assista ao nosso trailer e descubra a experiência imersiva que te espera.
+        </p>
+        <motion.div variants={itemVariants} className="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden shadow-2xl border-2 border-primary/30">
+          {/* Placeholder para vídeo do YouTube */}
+          <iframe
+            className="absolute inset-0 w-full h-full"
+            src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=YOUR_VIDEO_ID" // Substitua por um vídeo real
+            title="Jornada Bíblica Trailer"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/80 text-white text-2xl font-bold">
+            <PlayCircle className="w-20 h-20 text-primary opacity-70" />
+            <span className="sr-only">Play Video</span>
+          </div>
+        </motion.div>
+      </motion.section>
 
       {/* About Section */}
       <motion.section
@@ -79,7 +131,7 @@ export function LandingPage() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
       >
-        <h2 className="text-4xl font-bold text-gradient-primary mb-6">O Que é a Jornada Bíblica?</h2>
+        <h2 className="text-4xl font-bold text-gradient-primary mb-6">Aprofunde Sua Fé e Conhecimento</h2>
         <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-12">
           Prepare-se para uma experiência imersiva e desafiadora que testará e aprofundará seu conhecimento das Sagradas Escrituras. A Jornada Bíblica é mais do que um quiz; é uma ferramenta para o crescimento espiritual e intelectual.
         </p>
@@ -114,6 +166,9 @@ export function LandingPage() {
         </div>
       </motion.section>
 
+      {/* How It Works Section */}
+      <HowItWorksSection />
+
       {/* Game Modes Section */}
       <motion.section
         className="py-20 px-4 max-w-6xl mx-auto text-center"
@@ -128,11 +183,12 @@ export function LandingPage() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <motion.div variants={itemVariants}>
-            <Card className="h-full p-6 bg-quiz-card/50 border-border hover:border-primary transition-colors">
+          {/* Destaque para Solo Rápido */}
+          <motion.div variants={itemVariants} className="lg:col-span-1">
+            <Card className="h-full p-6 bg-quiz-card/50 border-2 border-primary shadow-lg hover:shadow-primary/50 transition-all hover:scale-105">
               <CardHeader>
                 <Zap className="w-10 h-10 text-primary mx-auto mb-3" />
-                <CardTitle className="text-xl">Solo Rápido</CardTitle>
+                <CardTitle className="text-xl font-bold">Solo Rápido</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">Responda 10 perguntas e veja sua pontuação no ranking local.</p>
@@ -172,11 +228,12 @@ export function LandingPage() {
               </CardContent>
             </Card>
           </motion.div>
-          <motion.div variants={itemVariants}>
-            <Card className="h-full p-6 bg-quiz-card/50 border-border hover:border-primary transition-colors">
+          {/* Destaque para Modo História */}
+          <motion.div variants={itemVariants} className="lg:col-span-1">
+            <Card className="h-full p-6 bg-quiz-card/50 border-2 border-primary shadow-lg hover:shadow-primary/50 transition-all hover:scale-105">
               <CardHeader>
                 <Globe className="w-10 h-10 text-primary mx-auto mb-3" />
-                <CardTitle className="text-xl">Modo História</CardTitle>
+                <CardTitle className="text-xl font-bold">Modo História</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">Embarque em uma jornada narrativa imersiva através dos grandes eventos da Bíblia.</p>
@@ -196,6 +253,12 @@ export function LandingPage() {
           </motion.div>
         </div>
       </motion.section>
+
+      {/* Mini Quiz Section */}
+      <MiniQuizSection />
+
+      {/* Testimonials Section */}
+      <TestimonialsSection />
 
       {/* Features Section */}
       <motion.section
@@ -218,7 +281,7 @@ export function LandingPage() {
                 <CardTitle className="text-xl">Ranking Global</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground text-sm">Compare sua pontuação com jogadores de todo o mundo.</p>
+                <p className="text-muted-foreground text-sm">Compare sua pontuação com jogadores de todo o mundo e veja quem é o mestre da Bíblia!</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -229,7 +292,7 @@ export function LandingPage() {
                 <CardTitle className="text-xl">Conquistas</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground text-sm">Desbloqueie badges e celebre seu progresso na jornada.</p>
+                <p className="text-muted-foreground text-sm">Desbloqueie badges e celebre seu progresso na jornada, mostrando suas vitórias!</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -240,7 +303,7 @@ export function LandingPage() {
                 <CardTitle className="text-xl">Loja Virtual</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground text-sm">Personalize sua experiência com avatares e temas exclusivos.</p>
+                <p className="text-muted-foreground text-sm">Personalize sua experiência com avatares e temas exclusivos, deixando o jogo com a sua cara.</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -251,7 +314,7 @@ export function LandingPage() {
                 <CardTitle className="text-xl">Modo Offline</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground text-sm">Jogue a qualquer hora, em qualquer lugar, sem precisar de internet.</p>
+                <p className="text-muted-foreground text-sm">Jogue a qualquer hora, em qualquer lugar, sem precisar de internet. Sua jornada nunca para!</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -262,7 +325,7 @@ export function LandingPage() {
                 <CardTitle className="text-xl">Estudo Personalizado</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground text-sm">Foque nas suas áreas de dificuldade com perguntas adaptadas ao seu perfil.</p>
+                <p className="text-muted-foreground text-sm">Foque nas suas áreas de dificuldade com perguntas adaptadas ao seu perfil, otimizando seu aprendizado.</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -273,7 +336,7 @@ export function LandingPage() {
                 <CardTitle className="text-xl">Dicas e Explicações</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground text-sm">Nunca fique na dúvida! Cada pergunta tem uma explicação e referência bíblica.</p>
+                <p className="text-muted-foreground text-sm">Nunca fique na dúvida! Cada pergunta tem uma explicação e referência bíblica para você aprender de verdade.</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -284,7 +347,7 @@ export function LandingPage() {
                 <CardTitle className="text-xl">Textos Bíblicos</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground text-sm">Acesse o texto completo da referência bíblica diretamente no jogo.</p>
+                <p className="text-muted-foreground text-sm">Acesse o texto completo da referência bíblica diretamente no jogo, sem precisar sair para consultar.</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -295,7 +358,7 @@ export function LandingPage() {
                 <CardTitle className="text-xl">Desafios Diários</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground text-sm">Novos desafios todos os dias para testar suas habilidades e ganhar recompensas.</p>
+                <p className="text-muted-foreground text-sm">Novos desafios todos os dias para testar suas habilidades e ganhar recompensas exclusivas.</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -332,6 +395,9 @@ export function LandingPage() {
         <p>&copy; {new Date().getFullYear()} Jornada Bíblica. Todos os direitos reservados.</p>
         <p className="mt-2">Desenvolvido com Fé e Dedicação.</p>
       </footer>
+
+      {/* Floating CTA */}
+      <FloatingCTA />
     </div>
   );
 }

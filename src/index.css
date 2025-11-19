@@ -76,8 +76,7 @@ All colors MUST be HSL.
     --celestial-blue: 210 80% 60%;
     --celestial-purple: 270 70% 50%;
     --celestial-gold: 45 93% 47%;
-    /* Removido: --orb-gradient: radial-gradient(circle at center, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.5) 30%, transparent 70%); */
-    /* Removido: --orb-gradient-dark: radial-gradient(circle at center, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.3) 30%, transparent 70%); */
+    --purple: 270 70% 50%; /* Adicionado */
 
     /* Variáveis para temas customizáveis */
     --theme-bg-start: var(--quiz-bg-start);

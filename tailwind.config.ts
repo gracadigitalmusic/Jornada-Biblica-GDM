@@ -75,6 +75,10 @@ export default {
           purple: "hsl(270 70% 50%)",
           gold: "hsl(45 93% 47%)",
         },
+        purple: { // Adicionando a cor purple
+          DEFAULT: "hsl(270 70% 50%)",
+          500: "hsl(270 70% 50%)",
+        }
       },
       borderRadius: {
         lg: "var(--radius)",
