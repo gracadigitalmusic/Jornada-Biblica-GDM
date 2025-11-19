@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Question, Player } from '@/types/quiz';
-import { FALLBACK_QUESTIONS, GAME_CONSTANTS } from '@/data/questions';
+import { GAME_CONSTANTS } from '@/data/questions'; // Remover FALLBACK_QUESTIONS daqui
+import { supabase } from '@/integrations/supabase/client'; // Importar Supabase client
 
 function shuffle<T>(array: T[]): T[] {
   const arr = [...array];
@@ -47,11 +48,11 @@ export function useQuizGame() {
   const initializeGame = useCallback(async (
     playersList: Player[], 
     numQuestions: number, 
-    loadQuestionsFn: () => Promise<Question[]> // Nova função para carregar perguntas
+    loadQuestionsFn: () => Promise<Question[]> // Função para carregar perguntas
   ) => {
     setIsLoadingQuestions(true);
     
-    const allAvailableQuestions = await loadQuestionsFn();
+    const allAvailableQuestions = await loadQuestionsFn(); // Usa a função passada
     const availableQuestions = allAvailableQuestions.filter(q => !q.isKids);
     const shuffled = shuffle(availableQuestions);
     const selected = shuffled.slice(0, Math.min(numQuestions, shuffled.length));

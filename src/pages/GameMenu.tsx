@@ -17,9 +17,11 @@ import { useDailyChallenge } from "@/hooks/useDailyChallenge";
 import { useOfflineMode } from "@/hooks/useOfflineMode";
 import { useAdaptiveQuestions } from "@/hooks/useAdaptiveQuestions";
 import { Player, GameMode, Question } from "@/types/quiz";
-import { GAME_CONSTANTS } from "@/data/questions";
-import { Loader2 } from "lucide-react";
+import { GAME_CONSTANTS, FALLBACK_QUESTIONS } from "@/data/questions"; // Importar FALLBACK_QUESTIONS
+import { Loader2, Upload } from "lucide-react"; // Importar Upload
 import { throttle } from "lodash-es";
+import { supabase } from "@/integrations/supabase/client"; // Importar Supabase client
+import { Button } from "@/components/ui/button"; // Importar Button
 
 // Dynamic Imports for Code Splitting
 const LazyGameScreens = lazy(() => import("@/components/quiz/GameScreens").then(mod => ({ default: mod.GameScreens })));
@@ -36,6 +38,7 @@ const GameMenu = () => {
   const [showNextButton, setShowNextButton] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [isMigratingQuestions, setIsMigratingQuestions] = useState(false); // Novo estado
 
   const quiz = useQuizGame();
   const achievements = useAchievements();
@@ -221,10 +224,20 @@ const GameMenu = () => {
     }
   };
 
+  const fetchQuestionsFromSupabase = useCallback(async (): Promise<Question[]> => {
+    const { data, error } = await supabase.from('questions').select('*');
+    if (error) {
+      console.error('Erro ao buscar perguntas do Supabase:', error);
+      // Fallback para perguntas locais em caso de erro
+      return FALLBACK_QUESTIONS;
+    }
+    return data as Question[];
+  }, []);
+
   const handlePlayersReady = async (players: Player[]) => {
     setShowPlayerSetup(false);
     const numQuestions = setupMode === 'solo' ? 10 : 20 + (players.length - 2) * 5;
-    const firstQuestionText = await quiz.initializeGame(players, numQuestions, offlineMode.loadOfflineQuestions);
+    const firstQuestionText = await quiz.initializeGame(players, numQuestions, fetchQuestionsFromSupabase); // Usar fetchQuestionsFromSupabase
     setGameMode("quiz");
     achievements.unlock('start');
     setShowResults(false);
@@ -310,6 +323,37 @@ const GameMenu = () => {
     setGameMode("menu");
   };
 
+  // --- TEMPORARY MIGRATION FUNCTION ---
+  const migrateQuestionsToSupabase = async () => {
+    if (isMigratingQuestions) return;
+    setIsMigratingQuestions(true);
+    try {
+      // Primeiro, verificar se já existem perguntas no Supabase para evitar duplicatas
+      const { count } = await supabase.from('questions').select('*', { count: 'exact' });
+      if (count && count > 0) {
+        alert('Perguntas já existem no Supabase. Migração cancelada para evitar duplicatas.');
+        setIsMigratingQuestions(false);
+        return;
+      }
+
+      const { error } = await supabase.from('questions').insert(FALLBACK_QUESTIONS);
+      if (error) {
+        console.error('Erro ao migrar perguntas:', error);
+        alert('Erro ao migrar perguntas para o Supabase. Verifique o console.');
+      } else {
+        alert('Todas as perguntas foram migradas com sucesso para o Supabase! Por favor, recarregue a página.');
+        // Opcional: recarregar a página para garantir que o novo banco seja usado
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Erro inesperado na migração:', error);
+      alert('Erro inesperado na migração. Verifique o console.');
+    } finally {
+      setIsMigratingQuestions(false);
+    }
+  };
+  // --- END TEMPORARY MIGRATION FUNCTION ---
+
   return (
     <div className="relative overflow-hidden min-h-screen overflow-y-auto">
       {/* Animated background elements */}
@@ -318,6 +362,29 @@ const GameMenu = () => {
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
       </div>
+
+      {/* Botão de Migração Temporário */}
+      {gameMode === "menu" && (
+        <div className="absolute top-4 left-4 z-50">
+          <Button 
+            onClick={migrateQuestionsToSupabase} 
+            disabled={isMigratingQuestions}
+            className="bg-purple-500 hover:bg-purple-600 text-white gap-2"
+          >
+            {isMigratingQuestions ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Migrando...
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4" />
+                Migrar Perguntas (1x)
+              </>
+            )}
+          </Button>
+        </div>
+      )}
 
       {/* Game Screens (Lazy Loaded) */}
       <Suspense fallback={

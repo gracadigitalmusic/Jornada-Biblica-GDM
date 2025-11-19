@@ -1,14 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FALLBACK_QUESTIONS } from '@/data/questions';
 import { toast } from '@/hooks/use-toast';
-import { useQuestionCache } from './useQuestionCache'; // Importando o novo hook
+import { useQuestionCache } from './useQuestionCache';
+import { supabase } from '@/integrations/supabase/client'; // Importar Supabase client
+import { Question } from '@/types/quiz'; // Importar Question type
 
 export function useOfflineMode() {
   const { isReady: isCacheReady, lastSyncTime, cacheQuestions, loadQuestions, clearCache } = useQuestionCache();
   
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [isDataCached, setIsDataCached] = useState(false);
-  const [isServiceWorkerReady, setIsServiceWorkerReady] = useState(false); // Mantido para controle de PWA update
+  const [isServiceWorkerReady, setIsServiceWorkerReady] = useState(false);
 
   // Monitora status da conexão
   useEffect(() => {
@@ -59,10 +61,20 @@ export function useOfflineMode() {
   useEffect(() => {
     if (isCacheReady) {
       loadQuestions().then(questions => {
-        setIsDataCached(questions.length > FALLBACK_QUESTIONS.length / 2); // Verifica se há dados significativos
+        setIsDataCached(questions.length > 0); // Verifica se há dados no cache
       });
     }
   }, [isCacheReady, loadQuestions]);
+
+  // Função para buscar perguntas do Supabase
+  const fetchQuestionsFromSupabase = useCallback(async (): Promise<Question[]> => {
+    const { data, error } = await supabase.from('questions').select('*');
+    if (error) {
+      console.error('Erro ao buscar perguntas do Supabase:', error);
+      return []; // Retorna array vazio em caso de erro
+    }
+    return data as Question[];
+  }, []);
 
   // Faz download das perguntas para cache offline (IndexedDB)
   const downloadForOffline = useCallback(async () => {
@@ -71,8 +83,11 @@ export function useOfflineMode() {
     }
 
     try {
-      // Usamos FALLBACK_QUESTIONS como a fonte de dados para o cache
-      const success = await cacheQuestions(FALLBACK_QUESTIONS);
+      const questionsToCache = await fetchQuestionsFromSupabase();
+      if (questionsToCache.length === 0) {
+        throw new Error('Nenhuma pergunta encontrada para cachear.');
+      }
+      const success = await cacheQuestions(questionsToCache);
       
       if (success) {
         setIsDataCached(true);
@@ -83,11 +98,11 @@ export function useOfflineMode() {
       console.error('Erro ao fazer download offline:', error);
       throw error;
     }
-  }, [isCacheReady, cacheQuestions]);
+  }, [isCacheReady, cacheQuestions, fetchQuestionsFromSupabase]);
 
   // Carrega perguntas do cache offline
   const loadOfflineQuestions = useCallback(async () => {
-    if (!isCacheReady) return FALLBACK_QUESTIONS;
+    if (!isCacheReady) return FALLBACK_QUESTIONS; // Fallback para perguntas embutidas se o cache não estiver pronto
     
     const questions = await loadQuestions();
     
@@ -95,7 +110,7 @@ export function useOfflineMode() {
       return questions;
     }
     
-    // Fallback para as perguntas embutidas
+    // Fallback para as perguntas embutidas se o cache estiver vazio
     return FALLBACK_QUESTIONS;
   }, [isCacheReady, loadQuestions]);
 
@@ -109,18 +124,19 @@ export function useOfflineMode() {
   const syncData = useCallback(async () => {
     if (!isOffline && isCacheReady) {
       try {
-        // Simplesmente re-cacheia a lista completa de perguntas (simulando uma atualização)
-        await downloadForOffline();
-          
-        toast({
-          title: "📥 Dados atualizados!",
-          description: `${FALLBACK_QUESTIONS.length} perguntas sincronizadas com sucesso.`,
-        });
+        const questionsFromSupabase = await fetchQuestionsFromSupabase();
+        if (questionsFromSupabase.length > 0) {
+          await cacheQuestions(questionsFromSupabase);
+          toast({
+            title: "📥 Dados atualizados!",
+            description: `${questionsFromSupabase.length} perguntas sincronizadas com sucesso.`,
+          });
+        }
       } catch (error) {
         console.error('Erro na sincronização automática:', error);
       }
     }
-  }, [isOffline, isCacheReady, downloadForOffline]);
+  }, [isOffline, isCacheReady, fetchQuestionsFromSupabase, cacheQuestions]);
 
   // Sincroniza automaticamente quando volta online
   useEffect(() => {
