@@ -1,7 +1,7 @@
 // @ts-ignore
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 // @ts-ignore
-import Groq from 'https://esm.sh/groq@0.4.0?deno-std=0.190.0'; // Atualizado para 0.4.0
+import Groq from 'https://esm.sh/groq@0.4.0'; // Removido ?deno-std=0.190.0
 // @ts-ignore
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
@@ -46,10 +46,7 @@ serve(async (req) => {
     // @ts-ignore
     const GROQ_API_KEY = Deno.env.get('groq_api_key'); // Usando a chave da Groq
     if (!GROQ_API_KEY) {
-      throw new Response(JSON.stringify({ error: 'groq_api_key not set in Supabase secrets.' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      });
+      throw new Error('groq_api_key not set in Supabase secrets.');
     }
 
     const groq = new Groq({ apiKey: GROQ_API_KEY }); // Inicializando o cliente Groq
