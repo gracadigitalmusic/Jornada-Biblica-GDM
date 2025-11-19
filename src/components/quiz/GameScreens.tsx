@@ -40,7 +40,6 @@ interface GameScreensProps {
   onStartStudy: () => void;
   onStartTournament: () => void;
   onStartStory: () => void;
-  onStartCoopEntry: () => void;
   onShowRanking: () => void;
   onShowAchievements: () => void;
   onShowPowerUpShop: () => void;
@@ -48,9 +47,6 @@ interface GameScreensProps {
   onShowStats: () => void;
   onShowProfile: () => void;
   onSelectChapter: (chapterId: string) => void;
-  onEnterCoopLobby: () => void;
-  handleCoopGameStart: () => void;
-  handleCancelCoop: () => void;
   handleAnswer: (index: number) => void;
   handleNextQuestion: () => void;
   handleQuitQuiz: () => void;
@@ -58,7 +54,6 @@ interface GameScreensProps {
   handleEndGame: () => void;
   onSetGameMode: (mode: GameMode) => void;
   onStartPersonalizedStudy: () => void; // Novo handler
-  onShowQuestionSubmission: () => void; // Novo handler
 }
 
 export function GameScreens({
@@ -83,7 +78,6 @@ export function GameScreens({
   onStartStudy,
   onStartTournament,
   onStartStory,
-  onStartCoopEntry,
   onShowRanking,
   onShowAchievements,
   onShowPowerUpShop,
@@ -91,9 +85,6 @@ export function GameScreens({
   onShowStats,
   onShowProfile,
   onSelectChapter,
-  onEnterCoopLobby,
-  handleCoopGameStart,
-  handleCancelCoop,
   handleAnswer,
   handleNextQuestion,
   handleQuitQuiz,
@@ -101,7 +92,6 @@ export function GameScreens({
   handleEndGame,
   onSetGameMode,
   onStartPersonalizedStudy, // Passado para MenuScreen
-  onShowQuestionSubmission, // Passado para MenuScreen
 }: GameScreensProps) {
   
   const isReviewAvailable = reviewHistory.hasIncorrectQuestions();
@@ -136,7 +126,6 @@ export function GameScreens({
           onStartStudy={onStartStudy}
           onStartTournament={onStartTournament}
           onStartStory={onStartStory}
-          onStartCoop={onStartCoopEntry}
           onShowRanking={onShowRanking}
           onShowAchievements={onShowAchievements}
           onShowPowerUpShop={onShowPowerUpShop}
@@ -151,12 +140,9 @@ export function GameScreens({
           isOfflineDataCached={offlineMode.isDataCached} // Passando prop
           onDownloadOffline={offlineMode.downloadForOffline} // Passando handler
           onStartPersonalizedStudy={onStartPersonalizedStudy} // Passando o novo handler
-          onShowQuestionSubmission={onShowQuestionSubmission} // Passando o novo handler
           hasStats={hasStats} // Passando a nova prop
         />
       )}
-      
-      {/* Removido coop_entry */}
       
       {gameMode === "story" && (
         <StoryModeScreen
@@ -202,8 +188,6 @@ export function GameScreens({
         />
       )}
       
-      {/* Removido CoopGameScreen */}
-
       {gameMode === "results" && (
         <ResultsScreen
           players={quiz.players}
@@ -213,8 +197,6 @@ export function GameScreens({
           onEndGame={handleEndGame}
         />
       )}
-      
-      {/* Removido coop_lobby */}
     </div>
   );
 }

@@ -36,7 +36,6 @@ const Index = () => {
   const [showNextButton, setShowNextButton] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [showQuestionSubmission, setShowQuestionSubmission] = useState(false);
 
   const quiz = useQuizGame();
   const achievements = useAchievements();
@@ -194,13 +193,13 @@ const Index = () => {
   const handleShowPowerUpShop = () => setShowPowerUpShop(true);
   const handleShowStats = () => setShowStats(true);
   const handleShowProfile = () => setShowProfile(true);
-  const handleShowQuestionSubmission = () => setShowQuestionSubmission(true);
 
-  // Removido handlers de CO-OP
+  // Removido handlers de CO-OP e Question Submission
   const handleStartCoopEntry = () => {};
   const handleEnterCoopLobby = () => {};
   const handleCoopGameStart = () => {};
   const handleCancelCoop = () => {};
+  const handleShowQuestionSubmission = () => {}; // Removido a funcionalidade, mas mantido o handler vazio para evitar erros de referência
 
   const handleSelectChapter = (chapterId: string) => {
     storyMode.setCurrentChapter(chapterId);
@@ -397,8 +396,8 @@ const Index = () => {
         setShowStats={setShowStats}
         showProfile={showProfile}
         setShowProfile={setShowProfile}
-        showQuestionSubmission={showQuestionSubmission}
-        setShowQuestionSubmission={setShowQuestionSubmission}
+        showQuestionSubmission={false} // Sempre false agora
+        setShowQuestionSubmission={() => {}} // Função vazia
         onStartSolo={handleStartSolo}
       />
     </div>

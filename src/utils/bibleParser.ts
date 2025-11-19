@@ -78,45 +78,6 @@ export async function fetchBibleText(reference: string): Promise<string> {
 }
 
 /**
- * Busca uma explicação aprimorada por IA para uma pergunta.
- */
-export async function fetchAIExplanation(question: string, originalExplanation: string, reference: string): Promise<string> {
-  try {
-    const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-    const EDGE_FUNCTION_NAME = 'ai-explain'; // Nome da sua Edge Function
-    
-    if (!SUPABASE_URL) {
-      throw new Error('Variável de ambiente VITE_SUPABASE_URL não está configurada.');
-    }
-
-    // Construa a URL completa da Edge Function
-    const functionUrl = `${SUPABASE_URL}/functions/v1/${EDGE_FUNCTION_NAME}`;
-
-    const response = await fetch(functionUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // Adicione a chave anon aqui se a função não for protegida por RLS
-        // 'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-      },
-      body: JSON.stringify({ question, originalExplanation, reference }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `Erro na Edge Function: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.aiExplanation;
-  } catch (error: any) {
-    console.error('Erro ao buscar explicação da IA:', error);
-    // Relança o erro com uma mensagem mais específica
-    throw new Error(error.message || 'Erro desconhecido ao tentar gerar explicação da IA.');
-  }
-}
-
-/**
  * Formata uma referência bíblica para exibição
  */
 export function formatBibleReference(reference: string): string {
