@@ -1,5 +1,7 @@
+// @ts-ignore
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Groq from 'https://esm.sh/groq@0.1.0'; // Importando o cliente Groq
+// @ts-ignore
+import Groq from 'https://esm.sh/groq@0.1.0?deno-std=0.190.0'; // Adicionado ?deno-std=0.190.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,6 +24,7 @@ serve(async (req) => {
       });
     }
 
+    // @ts-ignore
     const GROQ_API_KEY = Deno.env.get('groq_api_key'); // Usando a nova variável de ambiente
 
     if (!GROQ_API_KEY) {

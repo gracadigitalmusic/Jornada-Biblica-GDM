@@ -1,5 +1,8 @@
+// @ts-ignore
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Groq from 'https://esm.sh/groq@0.1.0'; // Usando o cliente Groq
+// @ts-ignore
+import Groq from 'https://esm.sh/groq@0.1.0?deno-std=0.190.0'; // Adicionado ?deno-std=0.190.0'
+// @ts-ignore
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const corsHeaders = {
@@ -23,7 +26,9 @@ serve(async (req) => {
     }
 
     const supabaseClient = createClient(
+      // @ts-ignore
       Deno.env.get('SUPABASE_URL') ?? '',
+      // @ts-ignore
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '', // Use service role key for direct DB access
     );
 
@@ -38,6 +43,7 @@ serve(async (req) => {
       throw new Error(fetchError?.message || 'Question not found');
     }
 
+    // @ts-ignore
     const GROQ_API_KEY = Deno.env.get('groq_api_key'); // Usando a chave da Groq
     if (!GROQ_API_KEY) {
       throw new Error('groq_api_key not set in Supabase secrets.');
