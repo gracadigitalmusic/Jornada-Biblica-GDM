@@ -89,7 +89,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         messages: [{ role: "user", content: prompt }],
-        model: "llama3-8b-8192", // Modelo da Groq
+        model: "llama3-70b-8192", // Modelo da Groq atualizado
         temperature: 0.7,
         max_tokens: 1024,
       }),
