@@ -1,9 +1,7 @@
 // @ts-ignore
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 // @ts-ignore
-import Groq from 'npm:groq@0.4.0'; // Usando npm: prefixo
-// @ts-ignore
-import { createClient } from 'npm:@supabase/supabase-js@2.45.0'; // Usando npm: prefixo
+import { createClient } from 'npm:@supabase/supabase-js@2.45.0'; // Mantém a importação do Supabase JS
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -27,7 +25,7 @@ serve(async (req) => {
     }
 
     // @ts-ignore
-    const GROQ_API_KEY = Deno.env.get('groq_api_key'); // Usando a nova variável de ambiente
+    const GROQ_API_KEY = Deno.env.get('groq_api_key');
 
     if (!GROQ_API_KEY) {
       return new Response(JSON.stringify({ error: 'groq_api_key not set in Supabase secrets.' }), {
@@ -35,8 +33,6 @@ serve(async (req) => {
         status: 500,
       });
     }
-
-    const groq = new Groq({ apiKey: GROQ_API_KEY }); // Inicializando o cliente Groq
 
     const prompt = `Você é um especialista em teologia e história bíblica. Sua tarefa é expandir e aprofundar a explicação de uma pergunta bíblica, tornando-a mais rica e contextualizada. Mantenha um tom respeitoso e informativo.
 
@@ -46,13 +42,27 @@ Referência Bíblica: "${reference}"
 
 Por favor, forneça uma explicação aprimorada, com no mínimo 100 palavras, que inclua contexto histórico, teológico ou cultural relevante, e como a passagem se aplica à vida cristã, se apropriado. Não repita a pergunta ou a referência no início da sua resposta, apenas a explicação aprimorada.`;
 
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [{ role: "user", content: prompt }],
-      model: "llama3-8b-8192", // Modelo da Groq, você pode ajustar se preferir outro
-      temperature: 0.7,
-      max_tokens: 1024,
+    // Fazendo a chamada direta à API da Groq
+    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        messages: [{ role: "user", content: prompt }],
+        model: "llama3-8b-8192", // Modelo da Groq
+        temperature: 0.7,
+        max_tokens: 1024,
+      }),
     });
 
+    if (!groqResponse.ok) {
+      const errorData = await groqResponse.json();
+      throw new Error(`Groq API error: ${groqResponse.status} - ${JSON.stringify(errorData)}`);
+    }
+
+    const chatCompletion = await groqResponse.json();
     const aiExplanation = chatCompletion.choices[0]?.message?.content || "Não foi possível gerar uma explicação da IA.";
 
     return new Response(JSON.stringify({ aiExplanation }), {

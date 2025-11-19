@@ -1,9 +1,7 @@
 // @ts-ignore
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 // @ts-ignore
-import Groq from 'npm:groq@0.4.0'; // Usando npm: prefixo
-// @ts-ignore
-import { createClient } from 'npm:@supabase/supabase-js@2.45.0'; // Usando npm: prefixo
+import { createClient } from 'npm:@supabase/supabase-js@2.45.0'; // Mantém a importação do Supabase JS
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -44,12 +42,10 @@ serve(async (req) => {
     }
 
     // @ts-ignore
-    const GROQ_API_KEY = Deno.env.get('groq_api_key'); // Usando a chave da Groq
+    const GROQ_API_KEY = Deno.env.get('groq_api_key');
     if (!GROQ_API_KEY) {
       throw new Error('groq_api_key not set in Supabase secrets.');
     }
-
-    const groq = new Groq({ apiKey: GROQ_API_KEY }); // Inicializando o cliente Groq
 
     const prompt = `Você é um revisor de perguntas bíblicas para um quiz cristão. Avalie a seguinte pergunta com base nos critérios abaixo. Forneça um feedback construtivo e detalhado.
 
@@ -84,13 +80,27 @@ serve(async (req) => {
 \`\`\`
 `;
 
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [{ role: "user", content: prompt }],
-      model: "llama3-8b-8192", // Usando um modelo da Groq
-      temperature: 0.7,
-      max_tokens: 1024,
+    // Fazendo a chamada direta à API da Groq
+    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        messages: [{ role: "user", content: prompt }],
+        model: "llama3-8b-8192", // Modelo da Groq
+        temperature: 0.7,
+        max_tokens: 1024,
+      }),
     });
 
+    if (!groqResponse.ok) {
+      const errorData = await groqResponse.json();
+      throw new Error(`Groq API error: ${groqResponse.status} - ${JSON.stringify(errorData)}`);
+    }
+
+    const chatCompletion = await groqResponse.json();
     const aiFeedbackRaw = chatCompletion.choices[0]?.message?.content || "Não foi possível gerar feedback da IA.";
 
     // Attempt to parse AI's JSON output
