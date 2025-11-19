@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, Variants } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, XCircle, Lightbulb, BookOpen } from "lucide-react";
+import { CheckCircle, XCircle, Lightbulb, BookOpen, Coins, Sparkles } from "lucide-react";
+import { FALLBACK_QUESTIONS } from '@/data/questions'; // Importar perguntas reais
+import { Link } from "react-router-dom"; // Para o botão de jogar o jogo completo
 
 interface MiniQuestion {
+  id: string;
   question: string;
   options: string[];
   answer: number;
@@ -12,22 +15,15 @@ interface MiniQuestion {
   reference: string;
 }
 
-const miniQuizQuestions: MiniQuestion[] = [
-  {
-    question: "Quem foi o primeiro homem criado por Deus?",
-    options: ["Noé", "Abraão", "Adão", "Moisés"],
-    answer: 2,
-    explanation: "Adão foi o primeiro homem, formado do pó da terra por Deus.",
-    reference: "Gênesis 2:7"
-  },
-  {
-    question: "Qual o sinal que Deus colocou no céu para prometer que nunca mais inundaria a Terra?",
-    options: ["Uma estrela", "Um cometa", "Um arco-íris", "Uma nuvem especial"],
-    answer: 2,
-    explanation: "O arco-íris é o sinal da aliança de Deus com Noé e toda a criação, prometendo que nunca mais haveria um dilúvio global.",
-    reference: "Gênesis 9:13"
+// Função para embaralhar um array
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-];
+  return shuffled;
+}
 
 const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 50 },
@@ -40,9 +36,24 @@ const itemVariants: Variants = {
 };
 
 export function MiniQuizSection() {
+  const [miniQuizQuestions, setMiniQuizQuestions] = useState<MiniQuestion[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [miniScore, setMiniScore] = useState(0);
+  const [isQuizFinished, setIsQuizFinished] = useState(false);
+
+  // Carrega perguntas aleatórias na montagem do componente
+  useEffect(() => {
+    const easyQuestions = FALLBACK_QUESTIONS.filter(q => q.difficulty === 'junior' || q.difficulty === 'easy');
+    const selected = shuffleArray(easyQuestions).slice(0, 3); // 3 perguntas aleatórias
+    setMiniQuizQuestions(selected);
+    setMiniScore(0);
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setIsQuizFinished(false);
+  }, []);
 
   const currentQuestion = miniQuizQuestions[currentQuestionIndex];
 
@@ -50,13 +61,36 @@ export function MiniQuizSection() {
     if (selectedAnswer !== null) return;
     setSelectedAnswer(index);
     setShowFeedback(true);
+
+    if (index === currentQuestion.answer) {
+      setMiniScore(prev => prev + 100); // Pontuação simples
+    }
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = useCallback(() => {
     setSelectedAnswer(null);
     setShowFeedback(false);
-    setCurrentQuestionIndex((prev) => (prev + 1) % miniQuizQuestions.length);
-  };
+    if (currentQuestionIndex < miniQuizQuestions.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    } else {
+      setIsQuizFinished(true);
+    }
+  }, [currentQuestionIndex, miniQuizQuestions.length]);
+
+  if (miniQuizQuestions.length === 0) {
+    return (
+      <motion.section
+        className="py-20 px-4 max-w-3xl mx-auto text-center"
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
+        <h2 className="text-4xl font-bold text-gradient-primary mb-6">Carregando Mini-Quiz...</h2>
+        <p className="text-lg text-muted-foreground">Preparando suas perguntas bíblicas!</p>
+      </motion.section>
+    );
+  }
 
   return (
     <motion.section
@@ -68,15 +102,20 @@ export function MiniQuizSection() {
     >
       <h2 className="text-4xl font-bold text-gradient-primary mb-6">Teste Seu Conhecimento Agora!</h2>
       <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-12">
-        Responda a uma pergunta rápida e sinta o gostinho da Jornada Bíblica.
+        Responda a algumas perguntas rápidas e sinta o gostinho da Jornada Bíblica.
       </p>
 
       <motion.div variants={itemVariants}>
         <Card className="p-6 bg-quiz-card/50 border-primary/20">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-bold mb-4">{currentQuestion.question}</CardTitle>
+          <CardHeader className="pb-4 flex-row justify-between items-center">
+            <CardTitle className="text-xl font-bold">Pergunta {currentQuestionIndex + 1} de {miniQuizQuestions.length}</CardTitle>
+            <div className="flex items-center gap-2 text-lg font-bold text-primary">
+              <Coins className="w-6 h-6 text-yellow-500" />
+              {miniScore} pts
+            </div>
           </CardHeader>
           <CardContent className="space-y-3">
+            <p className="text-lg font-semibold mb-4">{currentQuestion.question}</p>
             {currentQuestion.options.map((option, index) => {
               const isCorrect = index === currentQuestion.answer;
               const isSelected = selectedAnswer === index;
@@ -121,7 +160,13 @@ export function MiniQuizSection() {
                   Referência: {currentQuestion.reference}
                 </p>
                 <Button onClick={handleNextQuestion} className="w-full mt-4">
-                  Próxima Pergunta
+                  {isQuizFinished ? (
+                    <Link to="/game" className="w-full">
+                      <Sparkles className="w-4 h-4 mr-2" /> Jogar o Jogo Completo!
+                    </Link>
+                  ) : (
+                    "Próxima Pergunta"
+                  )}
                 </Button>
               </motion.div>
             )}

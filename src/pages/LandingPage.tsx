@@ -2,13 +2,13 @@ import { motion, Variants } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Users, Zap, Globe, BrainCircuit, Trophy, Award, ShoppingBag, Download, ArrowRight, Lightbulb, Target, Infinity, BookMarked, HeartHandshake, ScrollText, GraduationCap, Crown, PlayCircle, BarChart3 } from "lucide-react";
+import { BookOpen, Users, Zap, Globe, BrainCircuit, Trophy, Award, ShoppingBag, Download, ArrowRight, Lightbulb, Target, Infinity, BookMarked, HeartHandshake, ScrollText, GraduationCap, Crown, BarChart3 } from "lucide-react";
 
 // Importando os novos componentes
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import { MiniQuizSection } from "@/components/landing/MiniQuizSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
-import { FloatingCTA } from "@/components/landing/FloatingCTA";
+// FloatingCTA foi removido
 
 // Definindo os variants com tipagem explícita e usando arrays para 'ease'
 const sectionVariants: Variants = {
@@ -26,17 +26,6 @@ export function LandingPage() {
     <div className="text-foreground font-poppins overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative h-svh flex flex-col items-center justify-center text-center p-4 overflow-hidden">
-        {/* Background Orbs/Glows - Removido para um fundo limpo */}
-        {/* <div className="absolute inset-0 pointer-events-none">
-          <motion.div 
-            className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-70 animate-float"
-          />
-          <motion.div 
-            className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-secondary/10 rounded-full blur-3xl opacity-70 animate-float"
-            style={{ animationDelay: "1s" }}
-          />
-        </div> */}
-
         <motion.img
           src="/logo_jogo.png"
           alt="Jornada Bíblica Logo"
@@ -97,35 +86,6 @@ export function LandingPage() {
           </div>
         </motion.div>
       </section>
-
-      {/* Video Section */}
-      <motion.section
-        className="py-20 px-4 max-w-6xl mx-auto text-center"
-        variants={sectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-      >
-        <h2 className="text-4xl font-bold text-gradient-secondary mb-6">Veja a Jornada em Ação!</h2>
-        <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-12">
-          Assista ao nosso trailer e descubra a experiência imersiva que te espera.
-        </p>
-        <motion.div variants={itemVariants} className="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden shadow-2xl border-2 border-primary/30">
-          {/* Placeholder para vídeo do YouTube */}
-          <iframe
-            className="absolute inset-0 w-full h-full"
-            src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=YOUR_VIDEO_ID" // Substitua por um vídeo real
-            title="Jornada Bíblica Trailer"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
-          <div className="absolute inset-0 flex items-center justify-center bg-black/80 text-white text-2xl font-bold">
-            <PlayCircle className="w-20 h-20 text-primary opacity-70" />
-            <span className="sr-only">Play Video</span>
-          </div>
-        </motion.div>
-      </motion.section>
 
       {/* About Section */}
       <motion.section
@@ -399,9 +359,6 @@ export function LandingPage() {
         <p>&copy; {new Date().getFullYear()} Jornada Bíblica. Todos os direitos reservados.</p>
         <p className="mt-2">Desenvolvido com Fé e Dedicação.</p>
       </footer>
-
-      {/* Floating CTA */}
-      <FloatingCTA />
     </div>
   );
 }
