@@ -170,6 +170,48 @@ export type Database = {
           },
         ]
       }
+      questions: { // Adicionada a definição da tabela 'questions'
+        Row: {
+          id: string;
+          type: string;
+          isKids: boolean;
+          difficulty: string;
+          question: string;
+          options: string[];
+          answer: number;
+          reference: string | null;
+          explanation: string | null;
+          category: string;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          type?: string;
+          isKids?: boolean;
+          difficulty: string;
+          question: string;
+          options: string[];
+          answer: number;
+          reference?: string | null;
+          explanation?: string | null;
+          category: string;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          type?: string;
+          isKids?: boolean;
+          difficulty?: string;
+          question?: string;
+          options?: string[];
+          answer?: number;
+          reference?: string | null;
+          explanation?: string | null;
+          category?: string;
+          created_at?: string | null;
+        };
+        Relationships: [];
+      };
       quiz_results: {
         Row: {
           category: string
