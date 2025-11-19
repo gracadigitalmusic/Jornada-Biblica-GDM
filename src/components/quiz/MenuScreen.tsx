@@ -172,8 +172,16 @@ export function MenuScreen(props: MenuScreenProps) {
       transition={{ duration: 0.5 }}
       className="flex flex-col items-center justify-start text-center space-y-8 relative max-w-6xl mx-auto pb-8 px-4 pt-4"
     >
-      {/* Top Bar & Logo */}
-      <div className="flex flex-col items-center justify-start mb-8 relative">
+      {/* Watermark Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div 
+          className="absolute inset-0 bg-no-repeat bg-center bg-contain opacity-5" 
+          style={{ backgroundImage: `url('/logo_jogo.png')` }} 
+        />
+      </div>
+
+      {/* Top Bar & Title */}
+      <div className="flex flex-col items-center justify-start mb-8 relative z-10">
         {/* Botões de Configuração */}
         <div className="absolute top-4 right-4 flex items-center gap-2">
           <Button onClick={props.onShowProfile} variant="ghost" size="icon" className="text-primary hover:bg-primary/10">
@@ -184,21 +192,7 @@ export function MenuScreen(props: MenuScreenProps) {
           </Button>
         </div>
 
-        {/* Central Orb/Portal */}
-        <motion.div 
-          initial={{ scale: 0.8, opacity: 0 }} 
-          animate={{ scale: 1, opacity: 1 }} 
-          transition={{ delay: 0.2, duration: 0.6, type: "spring", stiffness: 100 }} 
-          className="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center mb-6 mt-4 will-change-transform"
-        >
-          <div className="absolute inset-0 rounded-full orb-background animate-orb-pulse" />
-          <img 
-            src="/logo_jogo.png" 
-            alt="Jornada Bíblica Logo" 
-            className="w-28 h-28 md:w-36 md:h-36 object-contain z-10 animate-logo-pulse"
-          />
-        </motion.div>
-
+        {/* Título do Jogo */}
         <h1 className="text-4xl md:text-6xl font-black mt-4 tracking-tight" style={{ fontFamily: "'Orbitron', sans-serif" }}>
           <span className="text-gradient-primary">JORNADA</span><br /><span className="text-gradient-secondary">BÍBLICA</span>
         </h1>

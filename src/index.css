@@ -70,14 +70,14 @@ All colors MUST be HSL.
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 217 91% 60%;
 
     /* Novas variáveis para o tema high-tech/cristão */
     --celestial-blue: 210 80% 60%;
     --celestial-purple: 270 70% 50%;
     --celestial-gold: 45 93% 47%;
-    --orb-gradient: radial-gradient(circle at center, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.5) 30%, transparent 70%);
-    --orb-gradient-dark: radial-gradient(circle at center, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.3) 30%, transparent 70%);
+    /* Removido: --orb-gradient: radial-gradient(circle at center, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.5) 30%, transparent 70%); */
+    /* Removido: --orb-gradient-dark: radial-gradient(circle at center, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.3) 30%, transparent 70%); */
 
     /* Variáveis para temas customizáveis */
     --theme-bg-start: var(--quiz-bg-start);
@@ -122,12 +122,12 @@ All colors MUST be HSL.
     
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary: 224 76% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 217 91% 60%;
 
     /* Variáveis para temas customizáveis no modo escuro */
     --theme-bg-start: var(--quiz-bg-start);
@@ -206,14 +206,7 @@ All colors MUST be HSL.
     100% { transform: scale(1); opacity: 1; }
   }
   
-  @keyframes logo-pulse {
-    0%, 100% {
-      filter: drop-shadow(0 0 10px hsl(var(--primary) / 0.8)) drop_shadow(0 0 20px hsl(var(--secondary) / 0.4));
-    }
-    50% {
-      filter: drop-shadow(0 0 15px hsl(var(--primary) / 1)) drop_shadow(0 0 30px hsl(var(--secondary) / 0.6));
-    }
-  }
+  /* Removido: @keyframes logo-pulse */
 
   /* Novas animações e utilitários */
   .animate-pulse-glow-primary {
@@ -222,9 +215,7 @@ All colors MUST be HSL.
   .animate-pulse-glow-secondary {
     animation: pulse-glow-secondary 1.5s ease-in-out infinite alternate;
   }
-  .animate-orb-pulse {
-    animation: orb-pulse 3s ease-in-out infinite;
-  }
+  /* Removido: .animate-orb-pulse */
   .animate-fade-in-up {
     animation: fade-in-up 0.5s ease-out forwards;
   }
@@ -272,9 +263,7 @@ All colors MUST be HSL.
     animation: streak-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   
-  .animate-logo-pulse {
-    animation: logo-pulse 3s ease-in-out infinite;
-  }
+  /* Removido: .animate-logo-pulse */
   
   .shimmer {
     background: linear-gradient(
@@ -301,11 +290,7 @@ All colors MUST be HSL.
     background-clip: text;
   }
 
-  /* Estilo para o orbe central */
-  .orb-background {
-    background: var(--orb-gradient);
-  }
-  .dark .orb-background {
-    background: var(--orb-gradient-dark);
-  }
+  /* Removido: Estilo para o orbe central */
+  /* Removido: .orb-background */
+  /* Removido: .dark .orb-background */
 }
