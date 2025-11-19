@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Users, Zap, Globe, BrainCircuit, Trophy, Award, ShoppingBag, Download, ArrowRight, Lightbulb, Target, Infinity, BookMarked, HeartHandshake, ScrollText, GraduationCap } from "lucide-react";
+import { BookOpen, Users, Zap, Globe, BrainCircuit, Trophy, Award, ShoppingBag, Download, ArrowRight, Lightbulb, Target, Infinity, BookMarked, HeartHandshake, ScrollText, GraduationCap, Crown } from "lucide-react";
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 50 },
