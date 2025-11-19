@@ -38,6 +38,59 @@ export type Database = {
         }
         Relationships: []
       }
+      community_questions: {
+        Row: {
+          answer: number
+          category: string
+          created_at: string | null
+          difficulty: string
+          explanation: string | null
+          id: string
+          options: string[]
+          question: string
+          reference: string | null
+          status: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          answer: number
+          category: string
+          created_at?: string | null
+          difficulty: string
+          explanation?: string | null
+          id?: string
+          options: string[]
+          question: string
+          reference?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          answer?: number
+          category?: string
+          created_at?: string | null
+          difficulty?: string
+          explanation?: string | null
+          id?: string
+          options?: string[]
+          question?: string
+          reference?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_questions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       custom_questions: {
         Row: {
           answer: number

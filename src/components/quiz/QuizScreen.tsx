@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Heart, Lightbulb, Zap, Share2, Copy, Volume2, Brain } from "lucide-react";
+import { Heart, Lightbulb, Zap, Share2, Copy, Volume2, Brain, Loader2 } from "lucide-react"; // Importado Loader2
 import { Question, Player } from "@/types/quiz";
-import { GAME_CONSTants } from "@/data/questions";
+import { GAME_CONSTANTS } from "@/data/questions"; // Corrigido o nome da constante
 import { useGameSounds } from "@/hooks/useGameSounds";
 import { useBibleReference } from "@/hooks/useBibleReference";
 import { BibleReferenceDialog } from "./BibleReferenceDialog";

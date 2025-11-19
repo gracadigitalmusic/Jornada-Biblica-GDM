@@ -5,6 +5,7 @@ import { ShopItem } from '@/types/quiz';
 interface Theme {
   id: string;
   name: string;
+  description: string; // Adicionado a propriedade description
   variables: Record<string, string>; // Ex: { '--theme-primary': '200 50% 50%', '--theme-bg-start': '200 10% 5%' }
 }
 
@@ -18,6 +19,7 @@ interface ThemeContextType {
 const defaultTheme: Theme = {
   id: 'default',
   name: 'Padrão (Celestial)',
+  description: 'O tema original da Jornada Bíblica, com tons celestiais.',
   variables: {
     '--theme-bg-start': '220 40% 10%',
     '--theme-bg-end': '240 50% 8%',
@@ -31,6 +33,7 @@ const defaultTheme: Theme = {
 const darkGoldTheme: Theme = {
   id: 'theme_dark_gold',
   name: 'Dourado Escuro',
+  description: 'Um tema luxuoso com detalhes em ouro e tons escuros.',
   variables: {
     '--theme-bg-start': '20 20% 10%',
     '--theme-bg-end': '30 25% 8%',
@@ -44,6 +47,7 @@ const darkGoldTheme: Theme = {
 const oceanTheme: Theme = {
   id: 'theme_ocean',
   name: 'Oceano Celestial',
+  description: 'Tema inspirado nas águas sagradas, com azuis e verdes profundos.',
   variables: {
     '--theme-bg-start': '220 60% 12%',
     '--theme-bg-end': '200 70% 10%',

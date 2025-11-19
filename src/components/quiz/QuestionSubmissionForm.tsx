@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, Trash2, Send, Loader2 } from 'lucide-react';
+import { PlusCircle, Trash2, Send, Loader2, Check, Circle } from 'lucide-react'; // Importado Check e Circle
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Question } from '@/types/quiz';
@@ -14,7 +14,7 @@ interface QuestionSubmissionFormProps {
   onClose: () => void;
 }
 
-export function QuestionSubmissionForm({ onClose }: QuestionSubmissionFormProps) {
+export function QuestionSubmissionForm({ onClose }: QuestionSubmissionFormFormProps) {
   const { toast } = useToast();
   const [questionText, setQuestionText] = useState('');
   const [options, setOptions] = useState<string[]>(['', '', '', '']);
@@ -76,7 +76,7 @@ export function QuestionSubmissionForm({ onClose }: QuestionSubmissionFormProps)
 
     try {
       const { error } = await supabase
-        .from('community_questions')
+        .from('community_questions') // Corrigido para usar a tabela community_questions
         .insert({
           user_id: user.data.user.id,
           question: questionText.trim(),

@@ -264,7 +264,7 @@ const Index = () => {
       quiz.combo, 
       quiz.currentQuestion?.category || '', 
       result.correct, 
-      setupMode === 'marathon' ? 'marathon' : 'solo' // Determina se é modo maratona ou solo
+      gameMode === 'marathon' ? 'marathon' : 'solo' // Corrigido para usar gameMode
     );
     
     if (result.correct) {
