@@ -156,10 +156,10 @@ export function MenuScreen(props: MenuScreenProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="flex flex-col items-center justify-start text-center space-y-8 relative max-w-6xl mx-auto pb-8 px-4 pt-8"
+      className="flex flex-col items-center justify-start text-center space-y-8 relative max-w-6xl mx-auto pb-8 px-4 pt-4"
     >
       {/* Top Bar & Logo */}
-      <div className="flex flex-col items-center justify-center mb-8 relative">
+      <div className="flex flex-col items-center justify-start mb-8 relative">
         {/* Botões de Configuração */}
         <div className="absolute top-4 right-4 flex items-center gap-2">
           <Button onClick={props.onShowProfile} variant="ghost" size="icon" className="text-primary hover:bg-primary/10">
