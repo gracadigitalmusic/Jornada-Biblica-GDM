@@ -25,7 +25,7 @@ export function LandingPage() {
   return (
     <div className="text-foreground font-poppins overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative h-svh flex flex-col items-center justify-center text-center p-4 overflow-hidden bg-gradient-to-br from-quiz-bg-start to-quiz-bg-end">
+      <section className="relative h-svh flex flex-col items-center justify-center text-center p-4 overflow-hidden">
         {/* Background Orbs/Glows - Removido para um fundo limpo */}
         {/* <div className="absolute inset-0 pointer-events-none">
           <motion.div 
@@ -90,6 +90,10 @@ export function LandingPage() {
           <div className="flex items-center gap-2">
             <Users className="w-5 h-5 text-secondary" />
             <span>+1000 Jogadores Ativos</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-accent" />
+            <span>+5000 Sessões Concluídas</span>
           </div>
         </motion.div>
       </section>
