@@ -85,6 +85,10 @@ export async function fetchAIExplanation(question: string, originalExplanation: 
     const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
     const EDGE_FUNCTION_NAME = 'ai-explain'; // Nome da sua Edge Function
     
+    if (!SUPABASE_URL) {
+      throw new Error('Variável de ambiente VITE_SUPABASE_URL não está configurada.');
+    }
+
     // Construa a URL completa da Edge Function
     const functionUrl = `${SUPABASE_URL}/functions/v1/${EDGE_FUNCTION_NAME}`;
 
@@ -100,14 +104,15 @@ export async function fetchAIExplanation(question: string, originalExplanation: 
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || `Edge Function error: ${response.statusText}`);
+      throw new Error(errorData.error || `Erro na Edge Function: ${response.statusText}`);
     }
 
     const data = await response.json();
     return data.aiExplanation;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro ao buscar explicação da IA:', error);
-    return 'Não foi possível gerar uma explicação aprimorada no momento. Tente novamente mais tarde.';
+    // Relança o erro com uma mensagem mais específica
+    throw new Error(error.message || 'Erro desconhecido ao tentar gerar explicação da IA.');
   }
 }
 
