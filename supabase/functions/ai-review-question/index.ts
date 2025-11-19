@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { GoogleGenerativeAI } from 'https://esm.sh/@google/generative-ai@0.15.0';
+import Groq from 'https://esm.sh/groq@0.1.0'; // Usando o cliente Groq
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const corsHeaders = {
@@ -38,13 +38,12 @@ serve(async (req) => {
       throw new Error(fetchError?.message || 'Question not found');
     }
 
-    const GOOGLE_API_KEY = Deno.env.get('GOOGLE_API_KEY');
-    if (!GOOGLE_API_KEY) {
-      throw new Error('GOOGLE_API_KEY not set in Supabase secrets.');
+    const GROQ_API_KEY = Deno.env.get('groq_api_key'); // Usando a chave da Groq
+    if (!GROQ_API_KEY) {
+      throw new Error('groq_api_key not set in Supabase secrets.');
     }
 
-    const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const groq = new Groq({ apiKey: GROQ_API_KEY }); // Inicializando o cliente Groq
 
     const prompt = `Você é um revisor de perguntas bíblicas para um quiz cristão. Avalie a seguinte pergunta com base nos critérios abaixo. Forneça um feedback construtivo e detalhado.
 
@@ -79,9 +78,14 @@ serve(async (req) => {
 \`\`\`
 `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const aiFeedbackRaw = response.text();
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "llama3-8b-8192", // Usando um modelo da Groq
+      temperature: 0.7,
+      max_tokens: 1024,
+    });
+
+    const aiFeedbackRaw = chatCompletion.choices[0]?.message?.content || "Não foi possível gerar feedback da IA.";
 
     // Attempt to parse AI's JSON output
     let aiFeedbackParsed;
