@@ -52,10 +52,10 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         quiz: {
-          card: "hsl(var(--quiz-card))",
-          "card-hover": "hsl(var(--quiz-card-hover))",
-          "bg-start": "hsl(var(--quiz-bg-start))", // Adicionado
-          "bg-end": "hsl(var(--quiz-bg-end))",     // Adicionado
+          card: "hsl(var(--theme-card))", // Usando variável de tema
+          "card-hover": "hsl(var(--theme-card-hover))", // Usando variável de tema
+          "bg-start": "hsl(var(--theme-bg-start))",     // Usando variável de tema
+          "bg-end": "hsl(var(--theme-bg-end))",         // Usando variável de tema
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

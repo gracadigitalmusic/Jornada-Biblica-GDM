@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
-import { ShoppingBag, Coins, Gem, Sparkles, ArrowLeft, Check } from 'lucide-react';
+import { ShoppingBag, Coins, Gem, Sparkles, ArrowLeft, Check, Palette } from 'lucide-react'; // Adicionado Palette
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ShopItem, PlayerCurrency } from '@/types/quiz';
 import { toast } from 'sonner';
+import { useTheme } from '@/contexts/ThemeContext'; // Importar useTheme
 
 interface VirtualShopProps {
   open: boolean;
@@ -30,9 +31,19 @@ const rarityLabels = {
 };
 
 export function VirtualShop({ open, onClose, shopItems, currency, onPurchase }: VirtualShopProps) {
+  const { currentThemeId, applyTheme, availableThemes } = useTheme();
+
   const handlePurchase = (item: ShopItem) => {
     if (item.owned) {
-      toast.info('Você já possui este item!');
+      if (item.type === 'theme') {
+        applyTheme(item.id);
+        toast.success('Tema aplicado!', {
+          description: `O tema ${item.name} foi ativado.`,
+          icon: '🎨'
+        });
+      } else {
+        toast.info('Você já possui este item!');
+      }
       return;
     }
 
@@ -49,8 +60,24 @@ export function VirtualShop({ open, onClose, shopItems, currency, onPurchase }: 
         description: `${item.name} foi adicionado à sua coleção.`,
         icon: '🎉'
       });
+      if (item.type === 'theme') {
+        applyTheme(item.id); // Aplica o tema imediatamente após a compra
+      }
     }
   };
+
+  const shopItemsWithThemes = shopItems.map(item => {
+    if (item.type === 'theme') {
+      const theme = availableThemes.find(t => t.id === item.id);
+      return {
+        ...item,
+        name: theme?.name || item.name,
+        description: theme?.description || item.description,
+        owned: item.owned || (theme?.id === 'default') // Tema padrão é sempre 'owned'
+      };
+    }
+    return item;
+  });
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -92,14 +119,14 @@ export function VirtualShop({ open, onClose, shopItems, currency, onPurchase }: 
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {shopItems.map((item, index) => (
+              {shopItemsWithThemes.map((item, index) => (
                 <motion.div
                   key={item.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <Card className={`relative overflow-hidden ${item.owned ? 'border-green-500' : ''}`}>
+                  <Card className={`relative overflow-hidden ${item.owned ? 'border-green-500' : ''} ${item.id === currentThemeId ? 'ring-2 ring-primary' : ''}`}>
                     <div className={`absolute top-0 right-0 w-24 h-24 ${rarityColors[item.rarity]} opacity-10 rounded-bl-full`} />
                     
                     <CardHeader className="pb-3">
@@ -121,10 +148,31 @@ export function VirtualShop({ open, onClose, shopItems, currency, onPurchase }: 
                         </div>
                         
                         {item.owned ? (
-                          <Badge variant="default" className="bg-green-500">
-                            <Check className="w-3 h-3 mr-1" />
-                            Possui
-                          </Badge>
+                          item.type === 'theme' ? (
+                            <Button
+                              size="sm"
+                              onClick={() => handlePurchase(item)}
+                              disabled={item.id === currentThemeId}
+                              variant={item.id === currentThemeId ? 'secondary' : 'default'}
+                            >
+                              {item.id === currentThemeId ? (
+                                <>
+                                  <Check className="w-3 h-3 mr-1" />
+                                  Aplicado
+                                </>
+                              ) : (
+                                <>
+                                  <Palette className="w-3 h-3 mr-1" />
+                                  Aplicar
+                                </>
+                              )}
+                            </Button>
+                          ) : (
+                            <Badge variant="default" className="bg-green-500">
+                              <Check className="w-3 h-3 mr-1" />
+                              Possui
+                            </Badge>
+                          )
                         ) : (
                           <Button
                             size="sm"

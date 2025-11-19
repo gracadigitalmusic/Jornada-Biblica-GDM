@@ -2,9 +2,8 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Trophy, Coins, Check, ArrowRight, Sparkles } from 'lucide-react';
+import { Trophy, Coins, Check, ArrowRight, Sparkles, Target, Zap, BookOpen } from 'lucide-react'; // Novos ícones
 import { useDailyChallenge } from '@/hooks/useDailyChallenge';
-import { useVirtualShop } from '@/hooks/useVirtualShop';
 import { useToast } from '@/hooks/use-toast';
 
 interface DailyChallengeCardProps {
@@ -18,7 +17,7 @@ export function DailyChallengeCard({ onStartChallenge, onClaimReward }: DailyCha
 
   if (!challenge) return null;
 
-  const progressPercent = (challenge.currentProgress / challenge.targetScore) * 100;
+  const progressPercent = (challenge.currentProgress / challenge.target) * 100;
 
   const handleClaimReward = () => {
     onClaimReward();
@@ -28,6 +27,45 @@ export function DailyChallengeCard({ onStartChallenge, onClaimReward }: DailyCha
       description: `Você recebeu ${challenge.rewardCoins} moedas e ${challenge.rewardItem?.name || 'um item'}.`,
       duration: 5000,
     });
+  };
+
+  const getChallengeDescription = () => {
+    switch (challenge.type) {
+      case 'score':
+        return `Alcance <span class="font-bold text-primary">${challenge.target} pontos</span> em qualquer modo para ganhar recompensas!`;
+      case 'combo':
+        return `Alcance um combo de <span class="font-bold text-primary">${challenge.target} acertos</span> seguidos para ganhar recompensas!`;
+      case 'category_correct':
+        return `Acerte <span class="font-bold text-primary">${challenge.target} perguntas</span> na categoria <span class="font-bold text-primary">${challenge.category?.replace(/_/g, ' ').toUpperCase()}</span>!`;
+      case 'marathon_score':
+        return `Faça <span class="font-bold text-primary">${challenge.target} pontos</span> no Modo Maratona para ganhar recompensas!`;
+      default:
+        return `Complete este desafio para ganhar recompensas!`;
+    }
+  };
+
+  const getChallengeIcon = () => {
+    switch (challenge.type) {
+      case 'score': return <Trophy className="w-5 h-5 text-secondary" />;
+      case 'combo': return <Zap className="w-5 h-5 text-secondary" />;
+      case 'category_correct': return <BookOpen className="w-5 h-5 text-secondary" />;
+      case 'marathon_score': return <Target className="w-5 h-5 text-secondary" />;
+      default: return <Trophy className="w-5 h-5 text-secondary" />;
+    }
+  };
+
+  const getProgressText = () => {
+    switch (challenge.type) {
+      case 'score':
+      case 'marathon_score':
+        return `${challenge.currentProgress} / ${challenge.target} pts`;
+      case 'combo':
+        return `Combo: ${challenge.currentProgress} / ${challenge.target}`;
+      case 'category_correct':
+        return `Acertos: ${challenge.currentProgress} / ${challenge.target}`;
+      default:
+        return `${challenge.currentProgress} / ${challenge.target}`;
+    }
   };
 
   return (
@@ -40,7 +78,7 @@ export function DailyChallengeCard({ onStartChallenge, onClaimReward }: DailyCha
       <Card className={`p-4 border-2 ${challenge.isCompleted ? 'border-success animate-pulse-glow-primary' : 'border-secondary/30 shimmer'}`}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-secondary" />
+            {getChallengeIcon()}
             <h3 className="font-bold text-lg">Desafio Diário</h3>
           </div>
           <span className="text-xs text-muted-foreground">
@@ -48,13 +86,11 @@ export function DailyChallengeCard({ onStartChallenge, onClaimReward }: DailyCha
           </span>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-3">
-          Alcance <span className="font-bold text-primary">{challenge.targetScore} pontos</span> em qualquer modo para ganhar recompensas!
-        </p>
+        <p className="text-sm text-muted-foreground mb-3" dangerouslySetInnerHTML={{ __html: getChallengeDescription() }} />
 
         <Progress value={progressPercent} className="h-2 mb-3" />
         <p className="text-xs text-muted-foreground text-right mb-4">
-          {challenge.currentProgress} / {challenge.targetScore} pts
+          {getProgressText()}
         </p>
 
         <div className="flex justify-between items-center">

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback } => 'react';
 import { Question } from '@/types/quiz';
 import { FALLBACK_QUESTIONS } from '@/data/questions';
 import { useStats } from './useStats';

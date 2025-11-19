@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Trophy, Users, User, Zap, Award, Volume2, VolumeX, TrendingUp, ShoppingBag, Network, Infinity, Globe, Database, Target, Crown, BookOpen, BookMarked, Settings, LucideProps, Download, Sparkles, Heart, Shield, Lightbulb, BrainCircuit, MessageSquarePlus } from "lucide-react";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
-import { useStats } from "@/hooks/useStats";
+// Removido: import { useStats } from "@/hooks/useStats"; // Não é mais necessário aqui para a condição
 
 interface MenuScreenProps {
   onStartSolo: () => void;
@@ -27,7 +27,8 @@ interface MenuScreenProps {
   isOfflineDataCached: boolean;
   onDownloadOffline: () => void;
   onStartPersonalizedStudy: () => void;
-  onShowQuestionSubmission: () => void; // Novo handler
+  onShowQuestionSubmission: () => void;
+  hasStats: boolean; // Adicionado: Propriedade para indicar se há estatísticas
 }
 
 interface GameModeDefinition {
@@ -115,13 +116,9 @@ const LEARNING_MODES: GameModeDefinition[] = [
     subtitle: "Focado nas suas dificuldades",
     icon: BrainCircuit,
     onClick: (props: MenuScreenProps) => props.onStartPersonalizedStudy(),
-    color: 'purple',
+    color: 'purple', // Nova cor para este modo
     glow: 'glow-primary',
-    condition: (props: MenuScreenProps) => {
-      const { getCategoryPerformance, getDifficultyPerformance } = useStats();
-      const hasStats = getCategoryPerformance().some(c => c.total > 0) || getDifficultyPerformance().some(d => d.total > 0);
-      return hasStats;
-    }
+    condition: (props: MenuScreenProps) => props.hasStats // Usando a prop hasStats
   }
 ];
 

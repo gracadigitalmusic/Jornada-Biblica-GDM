@@ -36,7 +36,7 @@ const Index = () => {
   const [showNextButton, setShowNextButton] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [showQuestionSubmission, setShowQuestionSubmission] = useState(false); // Novo estado
+  const [showQuestionSubmission, setShowQuestionSubmission] = useState(false);
 
   const quiz = useQuizGame();
   const achievements = useAchievements();
@@ -52,6 +52,10 @@ const Index = () => {
   const dailyChallenge = useDailyChallenge();
   const offlineMode = useOfflineMode();
   const adaptiveQuestions = useAdaptiveQuestions();
+
+  // Calcular hasStats aqui, onde useStats é um hook válido
+  const { getCategoryPerformance, getDifficultyPerformance } = stats;
+  const hasStats = getCategoryPerformance().some(c => c.total > 0) || getDifficultyPerformance().some(d => d.total > 0);
 
   useEffect(() => {
     const handleResize = throttle(() => {
@@ -168,7 +172,7 @@ const Index = () => {
   const handleStartMarathon = async (player: Player) => {
     const firstQuestionText = await quiz.initializeGame([player], 999, offlineMode.loadOfflineQuestions);
     setGameMode("quiz");
-    setSetupMode('solo');
+    setSetupMode('solo'); // Marathon is a solo mode
     achievements.unlock('start');
     if (settings.isNarrationEnabled && firstQuestionText) {
       setTimeout(() => speak(firstQuestionText), 500);
@@ -190,7 +194,7 @@ const Index = () => {
   const handleShowPowerUpShop = () => setShowPowerUpShop(true);
   const handleShowStats = () => setShowStats(true);
   const handleShowProfile = () => setShowProfile(true);
-  const handleShowQuestionSubmission = () => setShowQuestionSubmission(true); // Novo handler
+  const handleShowQuestionSubmission = () => setShowQuestionSubmission(true);
 
   // Removido handlers de CO-OP
   const handleStartCoopEntry = () => {};
@@ -254,7 +258,14 @@ const Index = () => {
       stats.logAnswer(quiz.currentQuestion, result.correct, timeSpent);
     }
     
-    dailyChallenge.updateProgress(gainedPoints);
+    // Passar o gameMode atual para updateProgress
+    dailyChallenge.updateProgress(
+      gainedPoints, 
+      quiz.combo, 
+      quiz.currentQuestion?.category || '', 
+      result.correct, 
+      setupMode === 'marathon' ? 'marathon' : 'solo' // Determina se é modo maratona ou solo
+    );
     
     if (result.correct) {
       virtualShop.addCoins(gainedPoints);
@@ -362,7 +373,8 @@ const Index = () => {
           onSetGameMode={setGameMode}
           handleEndGame={handleEndGame}
           onStartPersonalizedStudy={handleStartPersonalizedStudy}
-          onShowQuestionSubmission={handleShowQuestionSubmission} // Passar o novo handler
+          onShowQuestionSubmission={handleShowQuestionSubmission}
+          hasStats={hasStats}
         />
       </Suspense>
 
@@ -385,8 +397,8 @@ const Index = () => {
         setShowStats={setShowStats}
         showProfile={showProfile}
         setShowProfile={setShowProfile}
-        showQuestionSubmission={showQuestionSubmission} // Passar o estado
-        setShowQuestionSubmission={setShowQuestionSubmission} // Passar o setter
+        showQuestionSubmission={showQuestionSubmission}
+        setShowQuestionSubmission={setShowQuestionSubmission}
         onStartSolo={handleStartSolo}
       />
     </div>

@@ -31,6 +31,7 @@ interface GameScreensProps {
   isGameOverState: boolean;
   dailyChallenge: ReturnType<typeof useDailyChallenge>;
   offlineMode: ReturnType<typeof useOfflineMode>; // Adicionando offlineMode
+  hasStats: boolean; // Nova prop
 
   // Handlers
   onStartSolo: () => void;
@@ -56,6 +57,8 @@ interface GameScreensProps {
   handleContinue: () => void;
   handleEndGame: () => void;
   onSetGameMode: (mode: GameMode) => void;
+  onStartPersonalizedStudy: () => void; // Novo handler
+  onShowQuestionSubmission: () => void; // Novo handler
 }
 
 export function GameScreens({
@@ -73,6 +76,7 @@ export function GameScreens({
   isGameOverState,
   dailyChallenge,
   offlineMode, // Desestruturado
+  hasStats, // Desestruturado
   onStartSolo,
   onStartMultiplayer,
   onStartMarathon,
@@ -96,6 +100,8 @@ export function GameScreens({
   handleContinue,
   handleEndGame,
   onSetGameMode,
+  onStartPersonalizedStudy, // Passado para MenuScreen
+  onShowQuestionSubmission, // Passado para MenuScreen
 }: GameScreensProps) {
   
   const isReviewAvailable = reviewHistory.hasIncorrectQuestions();
@@ -144,6 +150,9 @@ export function GameScreens({
           onClaimReward={handleClaimReward}
           isOfflineDataCached={offlineMode.isDataCached} // Passando prop
           onDownloadOffline={offlineMode.downloadForOffline} // Passando handler
+          onStartPersonalizedStudy={onStartPersonalizedStudy} // Passando o novo handler
+          onShowQuestionSubmission={onShowQuestionSubmission} // Passando o novo handler
+          hasStats={hasStats} // Passando a nova prop
         />
       )}
       

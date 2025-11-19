@@ -78,6 +78,14 @@ All colors MUST be HSL.
     --celestial-gold: 45 93% 47%;
     --orb-gradient: radial-gradient(circle at center, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.5) 30%, transparent 70%);
     --orb-gradient-dark: radial-gradient(circle at center, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.3) 30%, transparent 70%);
+
+    /* Variáveis para temas customizáveis */
+    --theme-bg-start: var(--quiz-bg-start);
+    --theme-bg-end: var(--quiz-bg-end);
+    --theme-primary: var(--primary);
+    --theme-secondary: var(--secondary);
+    --theme-card: var(--quiz-card);
+    --theme-card-hover: var(--quiz-card-hover);
   }
 
   .dark {
@@ -120,6 +128,14 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Variáveis para temas customizáveis no modo escuro */
+    --theme-bg-start: var(--quiz-bg-start);
+    --theme-bg-end: var(--quiz-bg-end);
+    --theme-primary: var(--primary);
+    --theme-secondary: var(--secondary);
+    --theme-card: var(--quiz-card);
+    --theme-card-hover: var(--quiz-card-hover);
   }
 }
 
@@ -136,7 +152,13 @@ All colors MUST be HSL.
   
   /* Adicionando o estilo de fundo ao container principal do app para manter o visual */
   #root > div {
-    @apply bg-gradient-to-br from-[hsl(var(--quiz-bg-start))] to-[hsl(var(--quiz-bg-end))] min-h-screen;
+    /* Usando as novas variáveis de tema */
+    background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+    --tw-gradient-from: hsl(var(--theme-bg-start)) var(--tw-gradient-from-position);
+    --tw-gradient-to: hsl(var(--theme-bg-start) / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+    --tw-gradient-to: hsl(var(--theme-bg-end)) var(--tw-gradient-to-position);
+    @apply min-h-screen;
   }
 }
 

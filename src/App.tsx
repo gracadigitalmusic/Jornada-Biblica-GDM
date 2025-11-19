@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { ThemeProvider } from "@/contexts/ThemeContext"; // Importar ThemeProvider
 
 const queryClient = new QueryClient();
 
@@ -27,19 +28,21 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ErrorBoundary onReset={handleReset}>
-            <Routes>
-              <Route path="/" element={<Index key={appKey} />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </ErrorBoundary>
-        </BrowserRouter>
-      </TooltipProvider>
+      <ThemeProvider> {/* Envolver o aplicativo com ThemeProvider */}
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ErrorBoundary onReset={handleReset}>
+              <Routes>
+                <Route path="/" element={<Index key={appKey} />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ErrorBoundary>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };
